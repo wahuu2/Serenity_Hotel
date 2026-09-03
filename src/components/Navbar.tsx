@@ -1,49 +1,60 @@
-"use client"; // needed for interactive components in App Router
-
 import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <nav className="w-full bg-black text-white px-6 py-4 flex items-center justify-between">
-      {/* Logo */}
-      <Link href="/" className="flex items-center gap-2">
-        <Image src="/images/logo.png" alt="Hotel Logo" width={40} height={40} />
-        <span className="text-xl font-bold tracking-wide">Serenity Hotel</span>
-      </Link>
+    <header className="border-b bg-white">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        {/* Logo */}
+        <Link href="/" className="text-2xl font-bold text-gray-900">
+          Serenity Hotel
+        </Link>
 
-      {/* Desktop Links */}
-      <div className="hidden md:flex gap-8 text-lg">
-        <Link href="/">Home</Link>
-        <Link href="/rooms">Rooms</Link>
-        <Link href="/booking">Booking</Link>
-        <Link href="/offers">Offers</Link>
-        <Link href="/about">About</Link>
-        <Link href="/contact">Contact</Link>
-      </div>
+        {/* Navigation */}
+        <div className="hidden items-center gap-8 md:flex">
+          <Link
+            href="/"
+            className="text-sm font-medium text-gray-700 hover:text-black"
+          >
+            Home
+          </Link>
 
-      {/* Mobile Menu Button */}
-      <button
-        className="md:hidden text-white"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        ☰
-      </button>
+          <Link
+            href="/rooms"
+            className="text-sm font-medium text-gray-700 hover:text-black"
+          >
+            Rooms
+          </Link>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="absolute top-16 left-0 w-full bg-black flex flex-col items-center gap-4 py-6 md:hidden">
-          <Link href="/" onClick={() => setIsOpen(false)}>Home</Link>
-          <Link href="/rooms" onClick={() => setIsOpen(false)}>Rooms</Link>
-          <Link href="/booking" onClick={() => setIsOpen(false)}>Booking</Link>
-          <Link href="/offers" onClick={() => setIsOpen(false)}>Offers</Link>
-          <Link href="/about" onClick={() => setIsOpen(false)}>About</Link>
-          <Link href="/contact" onClick={() => setIsOpen(false)}>Contact</Link>
+          <Link
+            href="/restaurant"
+            className="text-sm font-medium text-gray-700 hover:text-black"
+          >
+            Restaurant
+          </Link>
+
+          <Link
+            href="/services"
+            className="text-sm font-medium text-gray-700 hover:text-black"
+          >
+            Services
+          </Link>
+
+          <Link
+            href="/contact"
+            className="text-sm font-medium text-gray-700 hover:text-black"
+          >
+            Contact
+          </Link>
         </div>
-      )}
-    </nav>
+
+        {/* Booking Button */}
+        <Link
+          href="/bookings"
+          className="rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+        >
+          Book Now
+        </Link>
+      </nav>
+    </header>
   );
 }

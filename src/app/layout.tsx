@@ -1,18 +1,25 @@
-import "./globals.css";
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import "./globals.css";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Serenity Hotel",
-  description: "Luxury hotel booking website built with Next.js",
+  description: "Experience comfort, luxury, and exceptional hospitality.",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en">
       <body>
         <Navbar />
-        <main>{children}</main>
+
+        {children}
+
         <Footer />
       </body>
     </html>

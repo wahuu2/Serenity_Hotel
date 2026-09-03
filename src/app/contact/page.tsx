@@ -1,104 +1,140 @@
-"use client";
-
-import { useState } from "react";
-
-export default function ContactPage(){
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Contact form submitted:", { name, email, message });
-    alert(`Thank you, ${name}! We’ll get back to you soon.`);
-    setName("");
-    setEmail("");
-    setMessage("");
-  };
-
+export default function ContactPage() {
   return (
-    <section className="max-w-4xl mx-auto px-6 py-12">
-      <h1 className="text-4xl font-bold mb-8 text-center">Contact Us</h1>
-
-      {/* Contact Info */}
-      <div className="mb-10 text-center">
-        <p className="text-lg text-zinc-700 dark:text-zinc-300">
-          📍 Nairobi, Kenya
+    <main className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <section className="bg-gray-900 px-6 py-20 text-center text-white">
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gray-300">
+          Contact Us
         </p>
-        <p className="text-lg text-zinc-700 dark:text-zinc-300">
-          📞 +254 700 123 456
+
+        <h1 className="mt-3 text-4xl font-bold md:text-5xl">
+          We Would Love to Hear From You
+        </h1>
+
+        <p className="mx-auto mt-5 max-w-2xl text-gray-300">
+          Have a question about our rooms, restaurant, or services?
+          Get in touch with the Serenity Hotel team.
         </p>
-        <p className="text-lg text-zinc-700 dark:text-zinc-300">
-          ✉️ info@serenityhotel.com
-        </p>
-      </div>
+      </section>
 
-      {/* Contact Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white dark:bg-zinc-900 shadow-md rounded-lg p-6 flex flex-col gap-6"
-      >
-        <div>
-          <label htmlFor="name" className="block mb-2 font-semibold">
-            Your Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
+      {/* Contact Content */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="grid gap-10 lg:grid-cols-2">
+          {/* Contact Information */}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Get in Touch
+            </h2>
+
+            <p className="mt-4 leading-7 text-gray-600">
+              Our team is available to assist you with reservations,
+              inquiries, events, and any other information you may need.
+            </p>
+
+            <div className="mt-8 space-y-6">
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  Location
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  Nairobi, Kenya
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  Phone
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  +254 700 000 000
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  Email
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  info@serenityhotel.com
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  Opening Hours
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  Front Desk: Open 24/7
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="rounded-xl bg-white p-8 shadow-sm">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Send Us a Message
+            </h2>
+
+            <form className="mt-6 space-y-5">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Full Name
+                </label>
+
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your name"
+                  className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Email Address
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="message"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Message
+                </label>
+
+                <textarea
+                  id="message"
+                  rows={5}
+                  placeholder="Write your message..."
+                  className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full rounded-md bg-gray-900 px-6 py-3 font-semibold text-white transition hover:bg-gray-700"
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
         </div>
-
-        <div>
-          <label htmlFor="email" className="block mb-2 font-semibold">
-            Your Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="message" className="block mb-2 font-semibold">
-            Message
-          </label>
-          <textarea
-            id="message"
-            rows={5}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          Send Message
-        </button>
-      </form>
-
-      {/* Optional Map Embed */}
-      <div className="mt-12">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31910.123456789!2d36.8219!3d-1.2921!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f173123456789%3A0xabcdef123456789!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2ske!4v1621234567890"
-          width="100%"
-          height="300"
-          style={{ border: 0 }}
-          allowFullScreen
-          loading="lazy"
-        ></iframe>
-      </div>
-    </section>
+      </section>
+    </main>
   );
 }
