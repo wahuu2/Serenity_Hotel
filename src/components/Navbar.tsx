@@ -1,11 +1,15 @@
 import Link from "next/link";
+import { Show, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   return (
     <header className="border-b bg-white">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-gray-900">
+        <Link
+          href="/"
+          className="text-2xl font-bold text-gray-900"
+        >
           Serenity Hotel
         </Link>
 
@@ -38,12 +42,16 @@ export default function Navbar() {
           >
             Services
           </Link>
-          <Link
-  href="/my-bookings"
-  className="text-sm font-medium text-gray-700 hover:text-gray-900"
->
-  My Bookings
-</Link>
+
+          {/* My Bookings - Logged In */}
+          <Show when="signed-in">
+            <Link
+              href="/my-bookings"
+              className="text-sm font-medium text-gray-700 hover:text-black"
+            >
+              My Bookings
+            </Link>
+          </Show>
 
           <Link
             href="/contact"
@@ -51,15 +59,37 @@ export default function Navbar() {
           >
             Contact
           </Link>
-        </div>
 
-        {/* Booking Button */}
-        <Link
-          href="/bookings"
-          className="rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
-        >
-          Book Now
-        </Link>
+          {/* Book Now */}
+          <Link
+            href="/bookings"
+            className="rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+          >
+            Book Now
+          </Link>
+
+          {/* Logged Out */}
+          <Show when="signed-out">
+            <Link
+              href="/sign-in"
+              className="text-sm font-semibold text-gray-700 hover:text-black"
+            >
+              Sign In
+            </Link>
+
+            <Link
+              href="/sign-up"
+              className="rounded-md border border-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-black hover:text-white"
+            >
+              Sign Up
+            </Link>
+          </Show>
+
+          {/* Logged In */}
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
+        </div>
       </nav>
     </header>
   );
