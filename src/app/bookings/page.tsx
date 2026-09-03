@@ -76,7 +76,9 @@ function BookingForm() {
 
   const total = room ? room.price * nights : 0;
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     setError("");
@@ -87,7 +89,9 @@ function BookingForm() {
     }
 
     if (!checkIn || !checkOut) {
-      setError("Please select your check-in and check-out dates.");
+      setError(
+        "Please select your check-in and check-out dates."
+      );
       return;
     }
 
@@ -125,7 +129,9 @@ function BookingForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Failed to create booking");
+        setError(
+          data.message || "Failed to create booking"
+        );
         return;
       }
 
@@ -134,7 +140,10 @@ function BookingForm() {
       );
     } catch (error) {
       console.error("Booking error:", error);
-      setError("Something went wrong while creating your booking.");
+
+      setError(
+        "Something went wrong while creating your booking."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -143,7 +152,9 @@ function BookingForm() {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <p className="text-gray-600">Loading booking details...</p>
+        <p className="text-gray-600">
+          Loading booking details...
+        </p>
       </main>
     );
   }
@@ -157,7 +168,8 @@ function BookingForm() {
           </h1>
 
           <p className="mt-3 text-gray-600">
-            {error || "Please select a room before making a booking."}
+            {error ||
+              "Please select a room before making a booking."}
           </p>
         </div>
       </main>
@@ -178,7 +190,6 @@ function BookingForm() {
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 lg:grid-cols-3">
-
           <form
             onSubmit={handleSubmit}
             className="rounded-xl bg-white p-8 shadow-sm lg:col-span-2"
@@ -196,7 +207,6 @@ function BookingForm() {
             </p>
 
             <div className="mt-8 grid gap-6 md:grid-cols-2">
-
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Full Name
@@ -205,7 +215,9 @@ function BookingForm() {
                 <input
                   type="text"
                   value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
+                  onChange={(e) =>
+                    setGuestName(e.target.value)
+                  }
                   placeholder="Enter your full name"
                   required
                   className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
@@ -220,13 +232,14 @@ function BookingForm() {
                 <input
                   type="tel"
                   value={guestPhone}
-                  onChange={(e) => setGuestPhone(e.target.value)}
+                  onChange={(e) =>
+                    setGuestPhone(e.target.value)
+                  }
                   placeholder="+254 700 000 000"
                   required
                   className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
                 />
               </div>
-
             </div>
 
             <div className="mt-6">
@@ -237,7 +250,9 @@ function BookingForm() {
               <input
                 type="email"
                 value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
+                onChange={(e) =>
+                  setGuestEmail(e.target.value)
+                }
                 placeholder="you@example.com"
                 required
                 className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
@@ -249,7 +264,6 @@ function BookingForm() {
             </h2>
 
             <div className="mt-6 grid gap-6 md:grid-cols-2">
-
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Check-in Date
@@ -258,7 +272,9 @@ function BookingForm() {
                 <input
                   type="date"
                   value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
+                  onChange={(e) =>
+                    setCheckIn(e.target.value)
+                  }
                   required
                   className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
                 />
@@ -272,12 +288,13 @@ function BookingForm() {
                 <input
                   type="date"
                   value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
+                  onChange={(e) =>
+                    setCheckOut(e.target.value)
+                  }
                   required
                   className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
                 />
               </div>
-
             </div>
 
             <div className="mt-6">
@@ -287,7 +304,9 @@ function BookingForm() {
 
               <select
                 value={guests}
-                onChange={(e) => setGuests(Number(e.target.value))}
+                onChange={(e) =>
+                  setGuests(Number(e.target.value))
+                }
                 className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
               >
                 {Array.from(
@@ -320,13 +339,11 @@ function BookingForm() {
           </form>
 
           <div className="h-fit rounded-xl bg-white p-8 shadow-sm">
-
             <h2 className="text-xl font-bold text-gray-900">
               Booking Summary
             </h2>
 
             <div className="mt-6 space-y-4">
-
               <div className="flex justify-between gap-4">
                 <span className="text-gray-500">
                   Room
@@ -388,11 +405,8 @@ function BookingForm() {
                   </span>
                 </div>
               </div>
-
             </div>
-
           </div>
-
         </div>
       </section>
     </main>
