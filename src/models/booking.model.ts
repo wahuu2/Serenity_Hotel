@@ -2,6 +2,12 @@ import mongoose, { Schema, model, models } from "mongoose";
 
 const BookingSchema = new Schema(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
     room: {
       type: Schema.Types.ObjectId,
       ref: "Room",
@@ -72,7 +78,6 @@ const BookingSchema = new Schema(
   }
 );
 
-const Booking =
-  models.Booking || model("Booking", BookingSchema);
+const Booking = models.Booking || model("Booking", BookingSchema);
 
 export default Booking;
