@@ -83,7 +83,10 @@ export async function POST(request: Request) {
     const startDate = new Date(checkIn);
     const endDate = new Date(checkOut);
 
-    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+    if (
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(endDate.getTime())
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -100,6 +103,31 @@ export async function POST(request: Request) {
           message: "Check-out date must be after check-in date",
         },
         { status: 400 }
+      );
+    }
+
+    // Check for overlapping bookings.
+    const overlappingBooking = await Booking.findOne({
+      room: room._id,
+      status: {
+        $in: ["pending", "confirmed"],
+      },
+      checkIn: {
+        $lt: endDate,
+      },
+      checkOut: {
+        $gt: startDate,
+      },
+    });
+
+    if (overlappingBooking) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "This room is already booked for the selected dates. Please choose different dates or another room.",
+        },
+        { status: 409 }
       );
     }
 
