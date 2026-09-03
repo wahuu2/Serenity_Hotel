@@ -24,79 +24,41 @@ type Booking = {
 };
 
 export default function MyBookingsPage() {
-  const [email, setEmail] = useState("");
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function syncCurrentUser() {
+    async function fetchBookings() {
       try {
-        const response = await fetch("/api/users/sync", {
-          method: "POST",
-        });
+        setLoading(true);
+        setError("");
+
+        const response = await fetch("/api/bookings");
 
         const data = await response.json();
 
         if (!response.ok) {
-          console.error("User sync failed:", data.message);
+          setError(
+            data.message || "Failed to fetch your bookings."
+          );
           return;
         }
 
-        console.log("User synced successfully:", data.user);
-
-        if (data.user?.email) {
-          setEmail(data.user.email);
-        }
+        setBookings(data.bookings || []);
       } catch (error) {
-        console.error("User sync error:", error);
+        console.error("Fetch bookings error:", error);
+
+        setError(
+          "Something went wrong while fetching your bookings."
+        );
+      } finally {
+        setLoading(false);
       }
     }
 
-    syncCurrentUser();
+    fetchBookings();
   }, []);
-
-  async function handleSearch(
-    event: React.FormEvent<HTMLFormElement>
-  ) {
-    event.preventDefault();
-
-    setError("");
-    setBookings([]);
-    setSearched(false);
-
-    if (!email.trim()) {
-      setError("Please enter your email address.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const response = await fetch(
-        `/api/bookings?email=${encodeURIComponent(email.trim())}`
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Failed to fetch bookings.");
-        return;
-      }
-
-      setBookings(data.bookings);
-      setSearched(true);
-    } catch (error) {
-      console.error("Fetch bookings error:", error);
-
-      setError(
-        "Something went wrong while fetching your bookings."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
 
   function formatDate(date: string) {
     return new Date(date).toLocaleDateString("en-KE", {
@@ -123,10 +85,7 @@ export default function MyBookingsPage() {
   }
 
   function formatStatus(status: string) {
-    return (
-      status.charAt(0).toUpperCase() +
-      status.slice(1)
-    );
+    return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
   return (
@@ -141,71 +100,66 @@ export default function MyBookingsPage() {
         </h1>
 
         <p className="mx-auto mt-5 max-w-2xl text-gray-300">
-          View your Serenity Hotel reservations and booking
-          details.
+          View and manage your Serenity Hotel reservations.
         </p>
       </section>
 
       <section className="mx-auto max-w-5xl px-6 py-16">
-        <form
-          onSubmit={handleSearch}
-          className="rounded-xl bg-white p-8 shadow-sm"
-        >
-          <h2 className="text-2xl font-bold text-gray-900">
-            Find Your Bookings
-          </h2>
-
-          <p className="mt-2 text-gray-600">
-            Your signed-in Clerk email has been filled in
-            automatically.
-          </p>
-
-          <div className="mt-6 flex flex-col gap-4 md:flex-row">
-            <input
-              type="email"
-              value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
-              placeholder="you@example.com"
-              className="flex-1 rounded-md border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-              required
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="rounded-md bg-gray-900 px-8 py-3 font-semibold text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-            >
-              {loading ? "Searching..." : "Find Bookings"}
-            </button>
-          </div>
-
-          {error && (
-            <div className="mt-5 rounded-md bg-red-50 p-4 text-sm text-red-600">
-              {error}
-            </div>
-          )}
-        </form>
-
-        {searched && bookings.length === 0 && !error && (
-          <div className="mt-8 rounded-xl bg-white p-10 text-center shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-900">
-              No Bookings Found
-            </h2>
-
-            <p className="mt-3 text-gray-600">
-              We couldn't find any reservations associated
-              with this email address.
+        {loading && (
+          <div className="rounded-xl bg-white p-10 text-center shadow-sm">
+            <p className="text-gray-600">
+              Loading your bookings...
             </p>
           </div>
         )}
 
-        {bookings.length > 0 && (
-          <div className="mt-8 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Your Reservations
+        {!loading && error && (
+          <div className="rounded-xl bg-red-50 p-6 text-center">
+            <h2 className="text-lg font-semibold text-red-700">
+              Unable to Load Bookings
             </h2>
+
+            <p className="mt-2 text-sm text-red-600">
+              {error}
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && bookings.length === 0 && (
+          <div className="rounded-xl bg-white p-10 text-center shadow-sm">
+            <h2 className="text-2xl font-bold text-gray-900">
+              No Bookings Yet
+            </h2>
+
+            <p className="mx-auto mt-3 max-w-md text-gray-600">
+              You don't have any reservations yet. Explore
+              our rooms and make your first booking.
+            </p>
+
+            <a
+              href="/rooms"
+              className="mt-6 inline-block rounded-md bg-gray-900 px-6 py-3 font-semibold text-white transition hover:bg-gray-700"
+            >
+              Explore Rooms
+            </a>
+          </div>
+        )}
+
+        {!loading && !error && bookings.length > 0 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Your Reservations
+              </h2>
+
+              <p className="mt-1 text-gray-600">
+                {bookings.length}{" "}
+                {bookings.length === 1
+                  ? "reservation"
+                  : "reservations"}{" "}
+                found.
+              </p>
+            </div>
 
             {bookings.map((booking) => (
               <div
