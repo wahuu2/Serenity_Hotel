@@ -14,6 +14,32 @@ function generateBookingReference() {
   return `SH-${date}-${random}`;
 }
 
+export async function GET() {
+  try {
+    await connectToDatabase();
+
+    const bookings = await Booking.find()
+      .populate("room", "name type price")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return NextResponse.json({
+      success: true,
+      bookings,
+    });
+  } catch (error) {
+    console.error("Get bookings error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to fetch bookings",
+      },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     await connectToDatabase();
@@ -106,7 +132,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check for overlapping bookings.
     const overlappingBooking = await Booking.findOne({
       room: room._id,
       status: {
