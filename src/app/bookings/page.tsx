@@ -1,36 +1,51 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-const rooms = [
-  {
-    id: 1,
-    name: "Deluxe Room",
-    price: 8500,
-  },
-  {
-    id: 2,
-    name: "Executive Suite",
-    price: 12000,
-  },
-  {
-    id: 3,
-    name: "Family Room",
-    price: 15000,
-  },
-];
+type Room = {
+  _id: string;
+  name: string;
+  type: string;
+  price: number;
+  description: string;
+  capacity: number;
+  available: boolean;
+};
 
 function BookingForm() {
   const searchParams = useSearchParams();
+  const roomId = searchParams.get("room");
 
-  const roomId = Number(searchParams.get("room"));
-
-  const selectedRoom = rooms.find((room) => room.id === roomId);
-
+  const [room, setRoom] = useState<Room | null>(null);
+  const [loading, setLoading] = useState(true);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
+
+  useEffect(() => {
+    async function fetchRoom() {
+      if (!roomId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/rooms/${roomId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          setRoom(data.room);
+        }
+      } catch (error) {
+        console.error("Failed to fetch room:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchRoom();
+  }, [roomId]);
 
   const nights = useMemo(() => {
     if (!checkIn || !checkOut) return 0;
@@ -47,11 +62,17 @@ function BookingForm() {
     return calculatedNights > 0 ? calculatedNights : 0;
   }, [checkIn, checkOut]);
 
-  const total = selectedRoom
-    ? selectedRoom.price * nights
-    : 0;
+  const total = room ? room.price * nights : 0;
 
-  if (!selectedRoom) {
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <p className="text-gray-600">Loading booking details...</p>
+      </main>
+    );
+  }
+
+  if (!room) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
         <div className="text-center">
@@ -69,7 +90,6 @@ function BookingForm() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Header */}
       <section className="bg-gray-900 px-6 py-16 text-center text-white">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gray-300">
           Reservations
@@ -80,12 +100,12 @@ function BookingForm() {
         </h1>
       </section>
 
-      {/* Booking Form */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 lg:grid-cols-3">
-          
-          {/* Form */}
+
+          {/* Booking Form */}
           <div className="rounded-xl bg-white p-8 shadow-sm lg:col-span-2">
+
             <h2 className="text-2xl font-bold text-gray-900">
               Reservation Details
             </h2>
@@ -93,14 +113,13 @@ function BookingForm() {
             <p className="mt-2 text-gray-600">
               You are booking the{" "}
               <span className="font-semibold">
-                {selectedRoom.name}
+                {room.name}
               </span>
               .
             </p>
 
             <div className="mt-8 grid gap-6 md:grid-cols-2">
-              
-              {/* Check-in */}
+
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Check-in Date
@@ -114,7 +133,6 @@ function BookingForm() {
                 />
               </div>
 
-              {/* Check-out */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Check-out Date
@@ -127,30 +145,33 @@ function BookingForm() {
                   className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
                 />
               </div>
+
             </div>
 
-            {/* Guests */}
             <div className="mt-6">
+
               <label className="mb-2 block text-sm font-medium text-gray-700">
                 Number of Guests
               </label>
 
               <select
                 value={guests}
-                onChange={(e) =>
-                  setGuests(Number(e.target.value))
-                }
+                onChange={(e) => setGuests(Number(e.target.value))}
                 className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
               >
-                <option value={1}>1 Guest</option>
-                <option value={2}>2 Guests</option>
-                <option value={3}>3 Guests</option>
-                <option value={4}>4 Guests</option>
-                <option value={5}>5 Guests</option>
+                {Array.from(
+                  { length: room.capacity },
+                  (_, index) => index + 1
+                ).map((number) => (
+                  <option key={number} value={number}>
+                    {number}{" "}
+                    {number === 1 ? "Guest" : "Guests"}
+                  </option>
+                ))}
               </select>
+
             </div>
 
-            {/* Continue Button */}
             <button
               type="button"
               disabled={nights === 0}
@@ -158,23 +179,35 @@ function BookingForm() {
             >
               Continue to Payment
             </button>
+
           </div>
 
           {/* Booking Summary */}
           <div className="h-fit rounded-xl bg-white p-8 shadow-sm">
+
             <h2 className="text-xl font-bold text-gray-900">
               Booking Summary
             </h2>
 
             <div className="mt-6 space-y-4">
-              
+
               <div className="flex justify-between gap-4">
                 <span className="text-gray-500">
                   Room
                 </span>
 
                 <span className="font-medium text-gray-900">
-                  {selectedRoom.name}
+                  {room.name}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className="text-gray-500">
+                  Room Type
+                </span>
+
+                <span className="font-medium text-gray-900">
+                  {room.type}
                 </span>
               </div>
 
@@ -204,12 +237,14 @@ function BookingForm() {
                 </span>
 
                 <span className="font-medium text-gray-900">
-                  KSh {selectedRoom.price.toLocaleString()}
+                  KSh {room.price.toLocaleString()}
                 </span>
               </div>
 
               <div className="border-t pt-5">
+
                 <div className="flex items-center justify-between">
+
                   <span className="text-lg font-semibold text-gray-900">
                     Total
                   </span>
@@ -217,10 +252,13 @@ function BookingForm() {
                   <span className="text-2xl font-bold text-gray-900">
                     KSh {total.toLocaleString()}
                   </span>
+
                 </div>
+
               </div>
 
             </div>
+
           </div>
 
         </div>
