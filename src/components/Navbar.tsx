@@ -38,6 +38,12 @@ export default function Navbar() {
           >
             Services
           </Link>
+          <Link
+  href="/my-bookings"
+  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+>
+  My Bookings
+</Link>
 
           <Link
             href="/contact"

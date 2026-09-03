@@ -14,11 +14,26 @@ function generateBookingReference() {
   return `SH-${date}-${random}`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await connectToDatabase();
 
-    const bookings = await Booking.find()
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get("email");
+
+    if (!email) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Email address is required",
+        },
+        { status: 400 }
+      );
+    }
+
+    const bookings = await Booking.find({
+      guestEmail: email.toLowerCase(),
+    })
       .populate("room", "name type price")
       .sort({ createdAt: -1 })
       .lean();
