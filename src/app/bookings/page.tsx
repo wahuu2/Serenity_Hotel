@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 type Room = {
   _id: string;
@@ -15,10 +15,19 @@ type Room = {
 
 function BookingForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
   const roomId = searchParams.get("room");
 
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
@@ -36,9 +45,12 @@ function BookingForm() {
 
         if (data.success) {
           setRoom(data.room);
+        } else {
+          setError(data.message || "Failed to load room");
         }
       } catch (error) {
         console.error("Failed to fetch room:", error);
+        setError("Failed to load room details");
       } finally {
         setLoading(false);
       }
@@ -64,6 +76,70 @@ function BookingForm() {
 
   const total = room ? room.price * nights : 0;
 
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setError("");
+
+    if (!roomId) {
+      setError("No room selected.");
+      return;
+    }
+
+    if (!checkIn || !checkOut) {
+      setError("Please select your check-in and check-out dates.");
+      return;
+    }
+
+    if (nights <= 0) {
+      setError("Check-out date must be after check-in date.");
+      return;
+    }
+
+    if (guests > (room?.capacity ?? 0)) {
+      setError(
+        `This room can accommodate a maximum of ${room?.capacity} guests.`
+      );
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId,
+          guestName,
+          guestEmail,
+          guestPhone,
+          checkIn,
+          checkOut,
+          guests,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Failed to create booking");
+        return;
+      }
+
+      router.push(
+        `/bookings/success?reference=${data.booking.bookingReference}`
+      );
+    } catch (error) {
+      console.error("Booking error:", error);
+      setError("Something went wrong while creating your booking.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center">
@@ -81,7 +157,7 @@ function BookingForm() {
           </h1>
 
           <p className="mt-3 text-gray-600">
-            Please select a room before making a booking.
+            {error || "Please select a room before making a booking."}
           </p>
         </div>
       </main>
@@ -103,11 +179,12 @@ function BookingForm() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 lg:grid-cols-3">
 
-          {/* Booking Form */}
-          <div className="rounded-xl bg-white p-8 shadow-sm lg:col-span-2">
-
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-xl bg-white p-8 shadow-sm lg:col-span-2"
+          >
             <h2 className="text-2xl font-bold text-gray-900">
-              Reservation Details
+              Guest Details
             </h2>
 
             <p className="mt-2 text-gray-600">
@@ -122,6 +199,59 @@ function BookingForm() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Full Name
+                </label>
+
+                <input
+                  type="text"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  placeholder="Enter your full name"
+                  required
+                  className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Phone Number
+                </label>
+
+                <input
+                  type="tel"
+                  value={guestPhone}
+                  onChange={(e) => setGuestPhone(e.target.value)}
+                  placeholder="+254 700 000 000"
+                  required
+                  className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
+                />
+              </div>
+
+            </div>
+
+            <div className="mt-6">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+
+              <input
+                type="email"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
+              />
+            </div>
+
+            <h2 className="mt-10 text-2xl font-bold text-gray-900">
+              Reservation Details
+            </h2>
+
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Check-in Date
                 </label>
 
@@ -129,6 +259,7 @@ function BookingForm() {
                   type="date"
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
+                  required
                   className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
                 />
               </div>
@@ -142,6 +273,7 @@ function BookingForm() {
                   type="date"
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
+                  required
                   className="w-full rounded-md border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-400"
                 />
               </div>
@@ -149,7 +281,6 @@ function BookingForm() {
             </div>
 
             <div className="mt-6">
-
               <label className="mb-2 block text-sm font-medium text-gray-700">
                 Number of Guests
               </label>
@@ -169,20 +300,25 @@ function BookingForm() {
                   </option>
                 ))}
               </select>
-
             </div>
 
+            {error && (
+              <div className="mt-6 rounded-md bg-red-50 p-4 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
             <button
-              type="button"
-              disabled={nights === 0}
+              type="submit"
+              disabled={submitting || nights === 0}
               className="mt-8 w-full rounded-md bg-gray-900 px-6 py-3 font-semibold text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-300"
             >
-              Continue to Payment
+              {submitting
+                ? "Creating Booking..."
+                : "Confirm Booking"}
             </button>
+          </form>
 
-          </div>
-
-          {/* Booking Summary */}
           <div className="h-fit rounded-xl bg-white p-8 shadow-sm">
 
             <h2 className="text-xl font-bold text-gray-900">
@@ -242,9 +378,7 @@ function BookingForm() {
               </div>
 
               <div className="border-t pt-5">
-
                 <div className="flex items-center justify-between">
-
                   <span className="text-lg font-semibold text-gray-900">
                     Total
                   </span>
@@ -252,9 +386,7 @@ function BookingForm() {
                   <span className="text-2xl font-bold text-gray-900">
                     KSh {total.toLocaleString()}
                   </span>
-
                 </div>
-
               </div>
 
             </div>
