@@ -36,10 +36,7 @@ export async function GET() {
 
     const orders = await Order.find()
       .populate("user", "name email")
-      .populate("items.menuItem", "name category")
-      .sort({
-        createdAt: -1,
-      });
+      .sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,
