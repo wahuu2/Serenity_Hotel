@@ -35,6 +35,14 @@ export default function RestaurantOrderPage() {
   useEffect(() => {
     async function fetchMenu() {
       try {
+        /*
+         * Get the selected menu item from the URL.
+         * Example:
+         * /restaurant/order?item=68xxxxxxxx
+         */
+        const params = new URLSearchParams(window.location.search);
+        const selectedItemId = params.get("item");
+
         const response = await fetch("/api/restaurant/menu");
 
         const data = await response.json();
@@ -43,11 +51,34 @@ export default function RestaurantOrderPage() {
           throw new Error(data.message || "Failed to load menu.");
         }
 
-        setMenuItems(
-          data.menuItems.filter((item: MenuItem) => item.available)
+        const availableItems: MenuItem[] = data.menuItems.filter(
+          (item: MenuItem) => item.available
         );
+
+        setMenuItems(availableItems);
+
+        /*
+         * If the customer clicked "Order Now"
+         * for a specific menu item, automatically
+         * add that item to the cart.
+         */
+        if (selectedItemId) {
+          const selectedItem = availableItems.find(
+            (item) => item._id === selectedItemId
+          );
+
+          if (selectedItem) {
+            setCart([
+              {
+                menuItem: selectedItem,
+                quantity: 1,
+              },
+            ]);
+          }
+        }
       } catch (error) {
         console.error(error);
+
         setError("Failed to load the restaurant menu.");
       } finally {
         setLoading(false);
@@ -114,12 +145,15 @@ export default function RestaurantOrderPage() {
 
   function removeFromCart(menuItemId: string) {
     setCart((currentCart) =>
-      currentCart.filter((item) => item.menuItem._id !== menuItemId)
+      currentCart.filter(
+        (item) => item.menuItem._id !== menuItemId
+      )
     );
   }
 
   const totalAmount = cart.reduce(
-    (total, item) => total + item.menuItem.price * item.quantity,
+    (total, item) =>
+      total + item.menuItem.price * item.quantity,
     0
   );
 
@@ -163,7 +197,7 @@ export default function RestaurantOrderPage() {
           customerEmail:
             user.primaryEmailAddress?.emailAddress || "",
 
-          customerPhone: phone,
+          customerPhone: phone.trim(),
 
           items: cart.map((item) => ({
             menuItem: item.menuItem._id,
@@ -175,7 +209,9 @@ export default function RestaurantOrderPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to place order.");
+        throw new Error(
+          data.message || "Failed to place order."
+        );
       }
 
       setCart([]);
@@ -212,6 +248,7 @@ export default function RestaurantOrderPage() {
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-12">
       <div className="mx-auto max-w-7xl">
+        {/* Header */}
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-bold text-gray-900">
             Order From Our Restaurant
@@ -222,12 +259,14 @@ export default function RestaurantOrderPage() {
           </p>
         </div>
 
+        {/* Error */}
         {error && (
           <div className="mx-auto mb-6 max-w-4xl rounded-lg bg-red-100 px-4 py-3 text-red-700">
             {error}
           </div>
         )}
 
+        {/* Success */}
         {success && (
           <div className="mx-auto mb-6 max-w-4xl rounded-lg bg-green-100 px-4 py-3 text-green-700">
             {success}
@@ -254,6 +293,7 @@ export default function RestaurantOrderPage() {
                     key={item._id}
                     className="overflow-hidden rounded-xl bg-white shadow"
                   >
+                    {/* Image */}
                     {item.image ? (
                       <img
                         src={item.image}
@@ -378,6 +418,7 @@ export default function RestaurantOrderPage() {
               </div>
             )}
 
+            {/* Total */}
             <div className="mb-6 flex items-center justify-between border-t pt-5">
               <span className="text-lg font-semibold">
                 Total
@@ -388,6 +429,7 @@ export default function RestaurantOrderPage() {
               </span>
             </div>
 
+            {/* Customer Details */}
             {user ? (
               <>
                 <div className="mb-4">
@@ -453,7 +495,9 @@ export default function RestaurantOrderPage() {
                 <button
                   type="button"
                   onClick={placeOrder}
-                  disabled={ordering || cart.length === 0}
+                  disabled={
+                    ordering || cart.length === 0
+                  }
                   className="w-full rounded-lg bg-green-700 px-4 py-3 font-semibold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {ordering
