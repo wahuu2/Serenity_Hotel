@@ -1,57 +1,19 @@
 import Link from "next/link";
+import { connectToDatabase } from "@/lib/mongodb";
+import MenuItem from "@/models/menuItem.model";
 
-const menuItems = [
-  {
-    id: 1,
-    name: "Beef Burger",
-    category: "Main Course",
-    price: 950,
-    description:
-      "Juicy beef patty served with fresh vegetables, cheese, and crispy fries.",
-  },
-  {
-    id: 2,
-    name: "Grilled Chicken",
-    category: "Main Course",
-    price: 1400,
-    description:
-      "Tender grilled chicken served with seasonal vegetables and a side of potatoes.",
-  },
-  {
-    id: 3,
-    name: "Chicken Biryani",
-    category: "Main Course",
-    price: 1200,
-    description:
-      "Fragrant basmati rice cooked with tender chicken and aromatic spices.",
-  },
-  {
-    id: 4,
-    name: "Vegetable Pasta",
-    category: "Main Course",
-    price: 1000,
-    description:
-      "Fresh pasta tossed with seasonal vegetables in a creamy sauce.",
-  },
-  {
-    id: 5,
-    name: "Fresh Fruit Juice",
-    category: "Drinks",
-    price: 350,
-    description:
-      "Freshly prepared seasonal fruit juice served chilled.",
-  },
-  {
-    id: 6,
-    name: "Chocolate Cake",
-    category: "Dessert",
-    price: 500,
-    description:
-      "Rich and moist chocolate cake served with a smooth chocolate topping.",
-  },
-];
+export default async function RestaurantPage() {
+  await connectToDatabase();
 
-export default function RestaurantPage() {
+  const menuItems = await MenuItem.find({
+    available: true,
+  })
+    .sort({
+      category: 1,
+      createdAt: -1,
+    })
+    .lean();
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -82,48 +44,66 @@ export default function RestaurantPage() {
           </h2>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {menuItems.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-            >
-              {/* Image Placeholder */}
-              <div className="mb-5 flex h-40 items-center justify-center rounded-lg bg-gray-200">
-                <span className="text-sm text-gray-500">
-                  Food Image
-                </span>
-              </div>
+        {menuItems.length === 0 ? (
+          <div className="rounded-xl bg-white p-10 text-center shadow-sm">
+            <p className="text-gray-600">
+              Our restaurant menu is currently being updated.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {menuItems.map((item) => (
+              <div
+                key={item._id.toString()}
+                className="overflow-hidden rounded-xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              >
+                {/* Image */}
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="h-48 w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-48 items-center justify-center bg-gray-200">
+                    <span className="text-sm text-gray-500">
+                      Food Image
+                    </span>
+                  </div>
+                )}
 
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    {item.category}
+                <div className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        {item.category}
+                      </p>
+
+                      <h3 className="mt-1 text-xl font-bold text-gray-900">
+                        {item.name}
+                      </h3>
+                    </div>
+
+                    <span className="whitespace-nowrap font-bold text-gray-900">
+                      KSh {item.price.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-sm leading-6 text-gray-600">
+                    {item.description}
                   </p>
 
-                  <h3 className="mt-1 text-xl font-bold text-gray-900">
-                    {item.name}
-                  </h3>
+                  <Link
+                    href={`/restaurant/order?item=${item._id.toString()}`}
+                    className="mt-5 block rounded-md bg-gray-900 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-gray-700"
+                  >
+                    Order Now
+                  </Link>
                 </div>
-
-                <span className="font-bold text-gray-900">
-                  KSh {item.price.toLocaleString()}
-                </span>
               </div>
-
-              <p className="mt-3 text-sm leading-6 text-gray-600">
-                {item.description}
-              </p>
-
-              <Link
-                href={`/restaurant/order?item=${item.id}`}
-                className="mt-5 block rounded-md bg-gray-900 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-gray-700"
-              >
-                Order Now
-              </Link>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Dining CTA */}
