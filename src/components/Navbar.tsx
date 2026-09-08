@@ -44,14 +44,21 @@ export default function Navbar() {
           </Link>
 
           {/* My Bookings - Logged In */}
-          <Show when="signed-in">
-            <Link
-              href="/my-bookings"
-              className="text-sm font-medium text-gray-700 hover:text-black"
-            >
-              My Bookings
-            </Link>
-          </Show>
+<Show when="signed-in">
+  <Link
+    href="/my-bookings"
+    className="text-sm font-medium text-gray-700 hover:text-black"
+  >
+    My Bookings
+  </Link>
+
+  <Link
+    href="/restaurant/my-orders"
+    className="text-sm font-medium text-gray-700 hover:text-black"
+  >
+    My Orders
+  </Link>
+</Show>
 
           <Link
             href="/contact"
