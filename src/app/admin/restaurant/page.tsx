@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type MenuItem = {
   _id: string;
@@ -232,6 +233,12 @@ export default function AdminRestaurantPage() {
             + Add Menu Item
           </button>
         </div>
+        <Link
+  href="/admin/restaurant/orders"
+  className="inline-block rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+>
+  View Restaurant Orders
+</Link>
 
         {/* Form */}
         {showForm && (
