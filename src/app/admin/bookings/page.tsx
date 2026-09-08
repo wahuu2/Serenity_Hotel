@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import BookingActions from "./BookingActions";
 
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user.model";
@@ -135,6 +136,9 @@ export default async function AdminBookingsPage() {
                     <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                       Status
                     </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+  Actions
+</th>
                   </tr>
                 </thead>
 
@@ -249,6 +253,12 @@ export default async function AdminBookingsPage() {
                             {booking.status}
                           </span>
                         </td>
+                        <td className="whitespace-nowrap px-6 py-5">
+  <BookingActions
+    bookingId={booking._id.toString()}
+    status={booking.status}
+  />
+</td>
                       </tr>
                     );
                   })}
