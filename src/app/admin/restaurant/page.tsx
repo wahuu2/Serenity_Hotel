@@ -24,7 +24,9 @@ export default function AdminRestaurantPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
   const [showForm, setShowForm] = useState(false);
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -66,6 +68,28 @@ export default function AdminRestaurantPage() {
       image: "",
       available: true,
     });
+
+    setEditingItem(null);
+  };
+
+  const openAddForm = () => {
+    resetForm();
+    setShowForm(true);
+  };
+
+  const openEditForm = (item: MenuItem) => {
+    setEditingItem(item);
+
+    setForm({
+      name: item.name,
+      category: item.category,
+      description: item.description,
+      price: String(item.price),
+      image: item.image || "",
+      available: item.available,
+    });
+
+    setShowForm(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,8 +98,14 @@ export default function AdminRestaurantPage() {
     setSaving(true);
 
     try {
-      const response = await fetch("/api/admin/restaurant/menu", {
-        method: "POST",
+      const url = editingItem
+        ? `/api/admin/restaurant/menu/${editingItem._id}`
+        : "/api/admin/restaurant/menu";
+
+      const method = editingItem ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -92,14 +122,19 @@ export default function AdminRestaurantPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        alert(data.message || "Failed to create menu item");
+        alert(data.message || "Failed to save menu item");
         return;
       }
 
-      alert("Menu item created successfully");
+      alert(
+        editingItem
+          ? "Menu item updated successfully"
+          : "Menu item created successfully"
+      );
 
-      resetForm();
       setShowForm(false);
+      resetForm();
+
       await fetchMenuItems();
     } catch (error) {
       console.error(error);
@@ -109,9 +144,72 @@ export default function AdminRestaurantPage() {
     }
   };
 
+  const toggleAvailability = async (item: MenuItem) => {
+    try {
+      const response = await fetch(
+        `/api/admin/restaurant/menu/${item._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            available: !item.available,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        alert(data.message || "Failed to update availability");
+        return;
+      }
+
+      await fetchMenuItems();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update availability");
+    }
+  };
+
+  const deleteItem = async (item: MenuItem) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${item.name}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/admin/restaurant/menu/${item._id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        alert(data.message || "Failed to delete menu item");
+        return;
+      }
+
+      alert("Menu item deleted successfully");
+
+      await fetchMenuItems();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete menu item");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-10">
       <div className="mx-auto max-w-7xl">
+        {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
@@ -128,21 +226,19 @@ export default function AdminRestaurantPage() {
           </div>
 
           <button
-            onClick={() => {
-              resetForm();
-              setShowForm(true);
-            }}
+            onClick={openAddForm}
             className="rounded-lg bg-gray-900 px-5 py-3 font-semibold text-white transition hover:bg-gray-700"
           >
             + Add Menu Item
           </button>
         </div>
 
+        {/* Form */}
         {showForm && (
           <div className="mb-8 rounded-xl bg-white p-6 shadow-sm">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">
-                Add Menu Item
+                {editingItem ? "Edit Menu Item" : "Add Menu Item"}
               </h2>
 
               <button
@@ -283,19 +379,35 @@ export default function AdminRestaurantPage() {
                 </label>
               </div>
 
-              <div className="md:col-span-2">
+              <div className="flex gap-3 md:col-span-2">
                 <button
                   type="submit"
                   disabled={saving}
                   className="rounded-lg bg-gray-900 px-6 py-3 font-semibold text-white hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {saving ? "Creating..." : "Create Menu Item"}
+                  {saving
+                    ? "Saving..."
+                    : editingItem
+                    ? "Update Menu Item"
+                    : "Create Menu Item"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForm(false);
+                    resetForm();
+                  }}
+                  className="rounded-lg border border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100"
+                >
+                  Cancel
                 </button>
               </div>
             </form>
           </div>
         )}
 
+        {/* Menu */}
         {loading ? (
           <div className="rounded-xl bg-white p-8 text-center shadow-sm">
             Loading menu...
@@ -337,7 +449,8 @@ export default function AdminRestaurantPage() {
                       </p>
                     </div>
 
-                    <span
+                    <button
+                      onClick={() => toggleAvailability(item)}
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         item.available
                           ? "bg-green-100 text-green-700"
@@ -347,7 +460,7 @@ export default function AdminRestaurantPage() {
                       {item.available
                         ? "Available"
                         : "Unavailable"}
-                    </span>
+                    </button>
                   </div>
 
                   <p className="mt-4 text-sm leading-6 text-gray-600">
@@ -357,6 +470,22 @@ export default function AdminRestaurantPage() {
                   <p className="mt-5 text-lg font-bold text-gray-900">
                     KSh {item.price.toLocaleString()}
                   </p>
+
+                  <div className="mt-5 flex gap-2">
+                    <button
+                      onClick={() => openEditForm(item)}
+                      className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => deleteItem(item)}
+                      className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
