@@ -1,26 +1,11 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import BookingActions from "./BookingActions";
 
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user.model";
 import Booking from "@/models/booking.model";
 
-function getStatusClasses(status: string) {
-  switch (status) {
-    case "confirmed":
-      return "bg-green-100 text-green-700";
-
-    case "completed":
-      return "bg-blue-100 text-blue-700";
-
-    case "cancelled":
-      return "bg-red-100 text-red-700";
-
-    default:
-      return "bg-yellow-100 text-yellow-700";
-  }
-}
+import BookingsTable from "./BookingsTable";
 
 export default async function AdminBookingsPage() {
   const clerkUser = await currentUser();
@@ -49,6 +34,33 @@ export default async function AdminBookingsPage() {
     .sort({ createdAt: -1 })
     .lean();
 
+  const serializedBookings = bookings.map((booking) => ({
+    _id: booking._id.toString(),
+    bookingReference: booking.bookingReference,
+    guestName: booking.guestName,
+    guestEmail: booking.guestEmail,
+    guestPhone: booking.guestPhone,
+    checkIn: booking.checkIn.toISOString(),
+    checkOut: booking.checkOut.toISOString(),
+    guests: booking.guests,
+    nights: booking.nights,
+    totalAmount: booking.totalAmount,
+    status: booking.status,
+    createdAt: booking.createdAt.toISOString(),
+    room: booking.room
+      ? {
+          name: (booking.room as any).name,
+          type: (booking.room as any).type,
+        }
+      : null,
+    user: booking.user
+      ? {
+          name: (booking.user as any).name,
+          email: (booking.user as any).email,
+        }
+      : null,
+  }));
+
   return (
     <main className="min-h-screen bg-gray-50">
       <section className="bg-gray-900 px-6 py-12 text-white">
@@ -76,11 +88,7 @@ export default async function AdminBookingsPage() {
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
-              {bookings.length}{" "}
-              {bookings.length === 1
-                ? "booking"
-                : "bookings"}{" "}
-              found
+              Manage guest reservations and booking statuses.
             </p>
           </div>
 
@@ -92,181 +100,7 @@ export default async function AdminBookingsPage() {
           </a>
         </div>
 
-        {bookings.length === 0 ? (
-          <div className="rounded-xl bg-white p-12 text-center shadow-sm">
-            <h3 className="text-xl font-semibold text-gray-900">
-              No bookings yet
-            </h3>
-
-            <p className="mt-2 text-gray-500">
-              Guest reservations will appear here once
-              they make a booking.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-xl bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      Booking
-                    </th>
-
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      Guest
-                    </th>
-
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      Room
-                    </th>
-
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      Stay
-                    </th>
-
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      Guests
-                    </th>
-
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      Total
-                    </th>
-
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-  Actions
-</th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-100">
-                  {bookings.map((booking) => {
-                    const room = booking.room as {
-                      name?: string;
-                      type?: string;
-                    } | null;
-
-                    const bookingUser = booking.user as {
-                      name?: string;
-                      email?: string;
-                    } | null;
-
-                    return (
-                      <tr
-                        key={booking._id.toString()}
-                        className="hover:bg-gray-50"
-                      >
-                        <td className="whitespace-nowrap px-6 py-5">
-                          <p className="font-semibold text-gray-900">
-                            {booking.bookingReference}
-                          </p>
-
-                          <p className="mt-1 text-xs text-gray-500">
-                            {new Date(
-                              booking.createdAt
-                            ).toLocaleDateString(
-                              "en-KE"
-                            )}
-                          </p>
-                        </td>
-
-                        <td className="px-6 py-5">
-                          <p className="font-medium text-gray-900">
-                            {booking.guestName}
-                          </p>
-
-                          <p className="mt-1 text-sm text-gray-500">
-                            {booking.guestEmail}
-                          </p>
-
-                          <p className="mt-1 text-sm text-gray-500">
-                            {booking.guestPhone}
-                          </p>
-
-                          {bookingUser && (
-                            <p className="mt-1 text-xs text-gray-400">
-                              Account:{" "}
-                              {bookingUser.name ||
-                                bookingUser.email}
-                            </p>
-                          )}
-                        </td>
-
-                        <td className="whitespace-nowrap px-6 py-5">
-                          <p className="font-medium text-gray-900">
-                            {room?.name ||
-                              "Unknown Room"}
-                          </p>
-
-                          <p className="mt-1 text-sm text-gray-500">
-                            {room?.type || ""}
-                          </p>
-                        </td>
-
-                        <td className="whitespace-nowrap px-6 py-5">
-                          <p className="text-sm text-gray-700">
-                            Check-in:{" "}
-                            {new Date(
-                              booking.checkIn
-                            ).toLocaleDateString(
-                              "en-KE"
-                            )}
-                          </p>
-
-                          <p className="mt-1 text-sm text-gray-700">
-                            Check-out:{" "}
-                            {new Date(
-                              booking.checkOut
-                            ).toLocaleDateString(
-                              "en-KE"
-                            )}
-                          </p>
-
-                          <p className="mt-1 text-xs text-gray-500">
-                            {booking.nights}{" "}
-                            {booking.nights === 1
-                              ? "night"
-                              : "nights"}
-                          </p>
-                        </td>
-
-                        <td className="whitespace-nowrap px-6 py-5 text-sm text-gray-700">
-                          {booking.guests}
-                        </td>
-
-                        <td className="whitespace-nowrap px-6 py-5">
-                          <p className="font-semibold text-gray-900">
-                            KSh{" "}
-                            {booking.totalAmount.toLocaleString()}
-                          </p>
-                        </td>
-
-                        <td className="whitespace-nowrap px-6 py-5">
-                          <span
-                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${getStatusClasses(
-                              booking.status
-                            )}`}
-                          >
-                            {booking.status}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-5">
-  <BookingActions
-    bookingId={booking._id.toString()}
-    status={booking.status}
-  />
-</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        <BookingsTable bookings={serializedBookings} />
       </section>
     </main>
   );
