@@ -31,19 +31,20 @@ export default function AdminRestaurantOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const response = await fetch(
-          "/api/admin/restaurant/orders"
-        );
+        const response = await fetch("/api/admin/restaurant/orders");
 
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.message || "Failed to fetch orders."
+            data.message || "Failed to fetch restaurant orders."
           );
         }
 
@@ -64,11 +65,85 @@ export default function AdminRestaurantOrdersPage() {
     fetchOrders();
   }, []);
 
+  const updateOrderStatus = async (
+    orderId: string,
+    status: Order["status"]
+  ) => {
+    try {
+      setUpdatingOrderId(orderId);
+
+      const response = await fetch(
+        `/api/admin/restaurant/orders/${orderId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        alert(data.message || "Failed to update order status.");
+        return;
+      }
+
+      setOrders((currentOrders) =>
+        currentOrders.map((order) =>
+          order._id === orderId
+            ? {
+                ...order,
+                status: data.order.status,
+              }
+            : order
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update order status.");
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
+  const getStatusClass = (status: Order["status"]) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-700";
+
+      case "confirmed":
+        return "bg-blue-100 text-blue-700";
+
+      case "preparing":
+        return "bg-purple-100 text-purple-700";
+
+      case "ready":
+        return "bg-green-100 text-green-700";
+
+      case "completed":
+        return "bg-gray-100 text-gray-700";
+
+      case "cancelled":
+        return "bg-red-100 text-red-700";
+
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50 p-6">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
+            Serenity Hotel
+          </p>
+
+          <h1 className="mt-2 text-3xl font-bold text-gray-900">
             Restaurant Orders
           </h1>
 
@@ -84,7 +159,11 @@ export default function AdminRestaurantOrdersPage() {
     return (
       <main className="min-h-screen bg-gray-50 p-6">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
+            Serenity Hotel
+          </p>
+
+          <h1 className="mt-2 text-3xl font-bold text-gray-900">
             Restaurant Orders
           </h1>
 
@@ -101,7 +180,11 @@ export default function AdminRestaurantOrdersPage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
+            Serenity Hotel
+          </p>
+
+          <h1 className="mt-2 text-3xl font-bold text-gray-900">
             Restaurant Orders
           </h1>
 
@@ -113,9 +196,7 @@ export default function AdminRestaurantOrdersPage() {
         {/* Summary */}
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-lg bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Total Orders
-            </p>
+            <p className="text-sm text-gray-500">Total Orders</p>
 
             <p className="mt-2 text-3xl font-bold text-gray-900">
               {orders.length}
@@ -123,9 +204,7 @@ export default function AdminRestaurantOrdersPage() {
           </div>
 
           <div className="rounded-lg bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Pending
-            </p>
+            <p className="text-sm text-gray-500">Pending</p>
 
             <p className="mt-2 text-3xl font-bold text-yellow-600">
               {
@@ -137,11 +216,9 @@ export default function AdminRestaurantOrdersPage() {
           </div>
 
           <div className="rounded-lg bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Preparing
-            </p>
+            <p className="text-sm text-gray-500">Preparing</p>
 
-            <p className="mt-2 text-3xl font-bold text-blue-600">
+            <p className="mt-2 text-3xl font-bold text-purple-600">
               {
                 orders.filter(
                   (order) => order.status === "preparing"
@@ -151,9 +228,7 @@ export default function AdminRestaurantOrdersPage() {
           </div>
 
           <div className="rounded-lg bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Completed
-            </p>
+            <p className="text-sm text-gray-500">Completed</p>
 
             <p className="mt-2 text-3xl font-bold text-green-600">
               {
@@ -215,7 +290,7 @@ export default function AdminRestaurantOrdersPage() {
                       className="hover:bg-gray-50"
                     >
                       {/* Order */}
-                      <td className="px-6 py-5">
+                      <td className="px-6 py-5 align-top">
                         <p className="font-semibold text-gray-900">
                           {order.orderReference}
                         </p>
@@ -229,12 +304,12 @@ export default function AdminRestaurantOrdersPage() {
                       </td>
 
                       {/* Customer */}
-                      <td className="px-6 py-5">
+                      <td className="px-6 py-5 align-top">
                         <p className="font-medium text-gray-900">
                           {order.customerName}
                         </p>
 
-                        <p className="text-sm text-gray-500">
+                        <p className="mt-1 text-sm text-gray-500">
                           {order.customerEmail}
                         </p>
 
@@ -244,7 +319,7 @@ export default function AdminRestaurantOrdersPage() {
                       </td>
 
                       {/* Items */}
-                      <td className="px-6 py-5">
+                      <td className="px-6 py-5 align-top">
                         <div className="space-y-1">
                           {order.items.map((item, index) => (
                             <p
@@ -258,7 +333,7 @@ export default function AdminRestaurantOrdersPage() {
                       </td>
 
                       {/* Total */}
-                      <td className="px-6 py-5">
+                      <td className="px-6 py-5 align-top">
                         <p className="font-semibold text-gray-900">
                           KSh{" "}
                           {order.totalAmount.toLocaleString()}
@@ -266,28 +341,67 @@ export default function AdminRestaurantOrdersPage() {
                       </td>
 
                       {/* Status */}
-                      <td className="px-6 py-5">
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${
-                            order.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : order.status === "confirmed"
-                              ? "bg-blue-100 text-blue-700"
-                              : order.status === "preparing"
-                              ? "bg-purple-100 text-purple-700"
-                              : order.status === "ready"
-                              ? "bg-green-100 text-green-700"
-                              : order.status === "completed"
-                              ? "bg-gray-100 text-gray-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {order.status}
-                        </span>
+                      <td className="px-6 py-5 align-top">
+                        <div className="space-y-2">
+                          <span
+                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${getStatusClass(
+                              order.status
+                            )}`}
+                          >
+                            {order.status}
+                          </span>
+
+                          {order.status !== "completed" &&
+                            order.status !== "cancelled" && (
+                              <select
+                                value={order.status}
+                                disabled={
+                                  updatingOrderId === order._id
+                                }
+                                onChange={(e) =>
+                                  updateOrderStatus(
+                                    order._id,
+                                    e.target.value as Order["status"]
+                                  )
+                                }
+                                className="w-full rounded-md border border-gray-300 bg-white px-2 py-2 text-xs text-gray-700 outline-none transition focus:border-gray-900 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60"
+                              >
+                                <option value="pending">
+                                  Pending
+                                </option>
+
+                                <option value="confirmed">
+                                  Confirmed
+                                </option>
+
+                                <option value="preparing">
+                                  Preparing
+                                </option>
+
+                                <option value="ready">
+                                  Ready
+                                </option>
+
+                                <option value="completed">
+                                  Completed
+                                </option>
+
+                                <option value="cancelled">
+                                  Cancelled
+                                </option>
+                              </select>
+                            )}
+
+                          {updatingOrderId === order._id && (
+                            <p className="text-xs text-gray-500">
+                              Updating...
+                            </p>
+                          )}
+                        </div>
                       </td>
 
                       {/* Date */}
-                      <td className="whitespace-nowrap px-6 py-5 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-6 py-5 align-top text-sm text-gray-500">
                         {new Date(
                           order.createdAt
                         ).toLocaleDateString()}
