@@ -3,31 +3,57 @@ import { redirect } from "next/navigation";
 
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user.model";
+import Room from "@/models/room.model";
+import Booking from "@/models/booking.model";
 
 export default async function AdminDashboardPage() {
   const clerkUser = await currentUser();
 
-  // User must be signed in
   if (!clerkUser) {
     redirect("/sign-in");
   }
 
   await connectToDatabase();
 
-  // Find the authenticated user in MongoDB
   const user = await User.findOne({
     clerkUserId: clerkUser.id,
   });
 
-  // User must exist in MongoDB
   if (!user) {
     redirect("/");
   }
 
-  // Only admins can access the dashboard
   if (user.role !== "admin") {
     redirect("/");
   }
+
+  const totalRooms = await Room.countDocuments();
+
+  const availableRooms = await Room.countDocuments({
+    available: true,
+  });
+
+  const totalBookings = await Booking.countDocuments();
+
+  const revenueResult = await Booking.aggregate([
+    {
+      $match: {
+        status: {
+          $in: ["confirmed", "completed"],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: {
+          $sum: "$totalAmount",
+        },
+      },
+    },
+  ]);
+
+  const totalRevenue = revenueResult[0]?.totalRevenue || 0;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -56,7 +82,7 @@ export default async function AdminDashboardPage() {
             </p>
 
             <p className="mt-3 text-3xl font-bold text-gray-900">
-              0
+              {totalRooms}
             </p>
           </div>
 
@@ -66,7 +92,7 @@ export default async function AdminDashboardPage() {
             </p>
 
             <p className="mt-3 text-3xl font-bold text-gray-900">
-              0
+              {availableRooms}
             </p>
           </div>
 
@@ -76,7 +102,7 @@ export default async function AdminDashboardPage() {
             </p>
 
             <p className="mt-3 text-3xl font-bold text-gray-900">
-              0
+              {totalBookings}
             </p>
           </div>
 
@@ -86,7 +112,7 @@ export default async function AdminDashboardPage() {
             </p>
 
             <p className="mt-3 text-3xl font-bold text-gray-900">
-              KSh 0
+              KSh {totalRevenue.toLocaleString()}
             </p>
           </div>
         </div>
