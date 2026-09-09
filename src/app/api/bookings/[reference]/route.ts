@@ -57,10 +57,21 @@ export async function GET(
       );
     }
 
-    const booking = await Booking.findOne({
-      bookingReference: reference,
-      user: user._id,
-    })
+    /*
+     * Customers can only view their own bookings.
+     * Admins can view any booking.
+     */
+    const bookingQuery =
+      user.role === "admin"
+        ? {
+            bookingReference: reference,
+          }
+        : {
+            bookingReference: reference,
+            user: user._id,
+          };
+
+    const booking = await Booking.findOne(bookingQuery)
       .populate("room", "name type price")
       .lean();
 
@@ -76,7 +87,6 @@ export async function GET(
 
     const payment = await Payment.findOne({
       booking: booking._id,
-      user: user._id,
     })
       .select(
         "amount currency paymentMethod transactionReference status paidAt createdAt"
@@ -85,8 +95,10 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
+
       booking: {
         _id: booking._id.toString(),
+
         bookingReference: booking.bookingReference,
 
         guestName: booking.guestName,
@@ -123,7 +135,10 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("Fetch booking confirmation error:", error);
+    console.error(
+      "Fetch booking confirmation error:",
+      error
+    );
 
     return NextResponse.json(
       {

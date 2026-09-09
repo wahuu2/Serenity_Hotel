@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 import BookingActions from "./BookingActions";
 
@@ -16,6 +17,7 @@ type Booking = {
   nights: number;
   totalAmount: number;
   status: string;
+  paymentStatus: string;
   createdAt: string;
   room: {
     name?: string;
@@ -45,6 +47,25 @@ function getStatusClasses(status: string) {
     default:
       return "bg-yellow-100 text-yellow-700";
   }
+}
+
+function getPaymentStatusClasses(paymentStatus: string) {
+  switch (paymentStatus) {
+    case "paid":
+      return "bg-green-100 text-green-700";
+
+    case "refunded":
+      return "bg-purple-100 text-purple-700";
+
+    default:
+      return "bg-yellow-100 text-yellow-700";
+  }
+}
+
+function formatStatus(status: string) {
+  if (!status) return "Unknown";
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 export default function BookingsTable({
@@ -77,6 +98,7 @@ export default function BookingsTable({
 
   return (
     <>
+      {/* Filters */}
       <div className="mb-6 grid gap-4 md:grid-cols-[1fr_220px]">
         <div>
           <label
@@ -90,7 +112,9 @@ export default function BookingsTable({
             id="booking-search"
             type="text"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
             placeholder="Search reference, guest name or email..."
             className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-gray-900"
           />
@@ -121,11 +145,13 @@ export default function BookingsTable({
         </div>
       </div>
 
+      {/* Results Count */}
       <p className="mb-4 text-sm text-gray-500">
         Showing {filteredBookings.length} of{" "}
         {bookings.length} bookings
       </p>
 
+      {/* Empty State */}
       {filteredBookings.length === 0 ? (
         <div className="rounded-xl bg-white p-12 text-center shadow-sm">
           <h3 className="text-xl font-semibold text-gray-900">
@@ -171,6 +197,10 @@ export default function BookingsTable({
                   </th>
 
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Payment
+                  </th>
+
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Actions
                   </th>
                 </tr>
@@ -182,6 +212,7 @@ export default function BookingsTable({
                     key={booking._id}
                     className="hover:bg-gray-50"
                   >
+                    {/* Booking */}
                     <td className="whitespace-nowrap px-6 py-5">
                       <p className="font-semibold text-gray-900">
                         {booking.bookingReference}
@@ -194,6 +225,7 @@ export default function BookingsTable({
                       </p>
                     </td>
 
+                    {/* Guest */}
                     <td className="px-6 py-5">
                       <p className="font-medium text-gray-900">
                         {booking.guestName}
@@ -216,6 +248,7 @@ export default function BookingsTable({
                       )}
                     </td>
 
+                    {/* Room */}
                     <td className="whitespace-nowrap px-6 py-5">
                       <p className="font-medium text-gray-900">
                         {booking.room?.name ||
@@ -227,6 +260,7 @@ export default function BookingsTable({
                       </p>
                     </td>
 
+                    {/* Stay */}
                     <td className="whitespace-nowrap px-6 py-5">
                       <p className="text-sm text-gray-700">
                         Check-in:{" "}
@@ -250,10 +284,12 @@ export default function BookingsTable({
                       </p>
                     </td>
 
+                    {/* Guests */}
                     <td className="whitespace-nowrap px-6 py-5 text-sm text-gray-700">
                       {booking.guests}
                     </td>
 
+                    {/* Total */}
                     <td className="whitespace-nowrap px-6 py-5">
                       <p className="font-semibold text-gray-900">
                         KSh{" "}
@@ -261,21 +297,46 @@ export default function BookingsTable({
                       </p>
                     </td>
 
+                    {/* Booking Status */}
                     <td className="whitespace-nowrap px-6 py-5">
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${getStatusClasses(
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusClasses(
                           booking.status
                         )}`}
                       >
-                        {booking.status}
+                        {formatStatus(booking.status)}
                       </span>
                     </td>
 
+                    {/* Payment Status */}
                     <td className="whitespace-nowrap px-6 py-5">
-                      <BookingActions
-                        bookingId={booking._id}
-                        status={booking.status}
-                      />
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getPaymentStatusClasses(
+                          booking.paymentStatus
+                        )}`}
+                      >
+                        {formatStatus(
+                          booking.paymentStatus
+                        )}
+                      </span>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="whitespace-nowrap px-6 py-5">
+                      <div className="flex flex-col gap-2">
+                        <BookingActions
+                          bookingId={booking._id}
+                          status={booking.status}
+                        />
+
+                        <Link
+                          href={`/bookings/${booking.bookingReference}/receipt`}
+                          target="_blank"
+                          className="rounded-md border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700 transition hover:border-gray-900 hover:text-gray-900"
+                        >
+                          View Receipt
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

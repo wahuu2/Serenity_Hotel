@@ -35,31 +35,32 @@ export default async function AdminBookingsPage() {
     .lean();
 
   const serializedBookings = bookings.map((booking) => ({
-    _id: booking._id.toString(),
-    bookingReference: booking.bookingReference,
-    guestName: booking.guestName,
-    guestEmail: booking.guestEmail,
-    guestPhone: booking.guestPhone,
-    checkIn: booking.checkIn.toISOString(),
-    checkOut: booking.checkOut.toISOString(),
-    guests: booking.guests,
-    nights: booking.nights,
-    totalAmount: booking.totalAmount,
-    status: booking.status,
-    createdAt: booking.createdAt.toISOString(),
-    room: booking.room
-      ? {
-          name: (booking.room as any).name,
-          type: (booking.room as any).type,
-        }
-      : null,
-    user: booking.user
-      ? {
-          name: (booking.user as any).name,
-          email: (booking.user as any).email,
-        }
-      : null,
-  }));
+  _id: booking._id.toString(),
+  bookingReference: booking.bookingReference,
+  guestName: booking.guestName,
+  guestEmail: booking.guestEmail,
+  guestPhone: booking.guestPhone,
+  checkIn: booking.checkIn.toISOString(),
+  checkOut: booking.checkOut.toISOString(),
+  guests: booking.guests,
+  nights: booking.nights,
+  totalAmount: booking.totalAmount,
+  status: booking.status,
+  paymentStatus: booking.paymentStatus,
+  createdAt: booking.createdAt.toISOString(),
+  room: booking.room
+    ? {
+        name: (booking.room as any).name,
+        type: (booking.room as any).type,
+      }
+    : null,
+  user: booking.user
+    ? {
+        name: (booking.user as any).name,
+        email: (booking.user as any).email,
+      }
+    : null,
+}));
 
   return (
     <main className="min-h-screen bg-gray-50">
