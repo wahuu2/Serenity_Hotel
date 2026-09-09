@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Room = {
   name: string;
@@ -20,6 +21,7 @@ type Booking = {
   nights: number;
   totalAmount: number;
   status: string;
+  paymentStatus: string;
   bookingReference: string;
 };
 
@@ -35,7 +37,6 @@ export default function MyBookingsPage() {
         setError("");
 
         const response = await fetch("/api/bookings");
-
         const data = await response.json();
 
         if (!response.ok) {
@@ -78,6 +79,19 @@ export default function MyBookingsPage() {
 
       case "completed":
         return "bg-blue-100 text-blue-700";
+
+      default:
+        return "bg-yellow-100 text-yellow-700";
+    }
+  }
+
+  function getPaymentStatusClasses(paymentStatus: string) {
+    switch (paymentStatus) {
+      case "paid":
+        return "bg-green-100 text-green-700";
+
+      case "refunded":
+        return "bg-purple-100 text-purple-700";
 
       default:
         return "bg-yellow-100 text-yellow-700";
@@ -136,12 +150,12 @@ export default function MyBookingsPage() {
               our rooms and make your first booking.
             </p>
 
-            <a
+            <Link
               href="/rooms"
               className="mt-6 inline-block rounded-md bg-gray-900 px-6 py-3 font-semibold text-white transition hover:bg-gray-700"
             >
               Explore Rooms
-            </a>
+            </Link>
           </div>
         )}
 
@@ -261,6 +275,29 @@ export default function MyBookingsPage() {
                       {booking.totalAmount.toLocaleString()}
                     </p>
                   </div>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-4 border-t border-gray-200 pt-6 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      Payment Status
+                    </p>
+
+                    <span
+                      className={`mt-1 inline-block rounded-full px-3 py-1 text-sm font-semibold ${getPaymentStatusClasses(
+                        booking.paymentStatus
+                      )}`}
+                    >
+                      {formatStatus(booking.paymentStatus)}
+                    </span>
+                  </div>
+
+                  <Link
+                    href={`/bookings/${booking.bookingReference}/receipt`}
+                    className="rounded-md bg-gray-900 px-5 py-3 text-center font-semibold text-white transition hover:bg-gray-700"
+                  >
+                    View / Print Receipt
+                  </Link>
                 </div>
               </div>
             ))}
