@@ -73,6 +73,7 @@ export default function BookingsTable({
 }: BookingsTableProps) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
 
   const filteredBookings = bookings.filter((booking) => {
     const searchValue = search.toLowerCase().trim();
@@ -93,13 +94,36 @@ export default function BookingsTable({
       statusFilter === "all" ||
       booking.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    const bookingCheckIn = new Date(booking.checkIn)
+      .toISOString()
+      .split("T")[0];
+
+    const matchesDate =
+      !dateFilter || bookingCheckIn === dateFilter;
+
+    return (
+      matchesSearch &&
+      matchesStatus &&
+      matchesDate
+    );
   });
+
+  function clearFilters() {
+    setSearch("");
+    setStatusFilter("all");
+    setDateFilter("");
+  }
+
+  const hasActiveFilters =
+    search ||
+    statusFilter !== "all" ||
+    dateFilter;
 
   return (
     <>
       {/* Filters */}
-      <div className="mb-6 grid gap-4 md:grid-cols-[1fr_220px]">
+      <div className="mb-6 grid gap-4 md:grid-cols-[1fr_220px_220px_auto]">
+        {/* Search */}
         <div>
           <label
             htmlFor="booking-search"
@@ -120,6 +144,7 @@ export default function BookingsTable({
           />
         </div>
 
+        {/* Status Filter */}
         <div>
           <label
             htmlFor="status-filter"
@@ -143,6 +168,39 @@ export default function BookingsTable({
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
+
+        {/* Date Filter */}
+        <div>
+          <label
+            htmlFor="date-filter"
+            className="mb-2 block text-sm font-medium text-gray-700"
+          >
+            Check-in Date
+          </label>
+
+          <input
+            id="date-filter"
+            type="date"
+            value={dateFilter}
+            onChange={(event) =>
+              setDateFilter(event.target.value)
+            }
+            className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-gray-900"
+          />
+        </div>
+
+        {/* Clear Filters */}
+        <div className="flex items-end">
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-gray-900 hover:text-gray-900"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Results Count */}
@@ -159,7 +217,7 @@ export default function BookingsTable({
           </h3>
 
           <p className="mt-2 text-gray-500">
-            Try changing your search or status filter.
+            Try changing your search, status, or date filter.
           </p>
         </div>
       ) : (
