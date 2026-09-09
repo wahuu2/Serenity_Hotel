@@ -71,6 +71,26 @@ export async function POST(request: Request) {
       );
     }
 
+    if (booking.paymentStatus === "paid") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "This booking has already been paid for.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (booking.status === "cancelled") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "A cancelled booking cannot be paid for.",
+        },
+        { status: 400 }
+      );
+    }
+
     const existingPayment = await Payment.findOne({
       booking: booking._id,
     });
@@ -101,11 +121,22 @@ export async function POST(request: Request) {
       paidAt: new Date(),
     });
 
+    booking.paymentStatus = "paid";
+    booking.status = "confirmed";
+
+    await booking.save();
+
     return NextResponse.json(
       {
         success: true,
         message: "Payment completed successfully.",
         payment,
+        booking: {
+          id: booking._id,
+          bookingReference: booking.bookingReference,
+          status: booking.status,
+          paymentStatus: booking.paymentStatus,
+        },
       },
       { status: 201 }
     );
