@@ -67,6 +67,12 @@ const BookingSchema = new Schema(
       default: "pending",
     },
 
+    paymentStatus: {
+  type: String,
+  enum: ["unpaid", "paid", "refunded"],
+  default: "unpaid",
+},
+
     bookingReference: {
       type: String,
       required: true,
