@@ -75,7 +75,63 @@ export default function AdminPaymentsPage() {
 
     fetchPayments();
   }, []);
+const handleStatusChange = async (
+  paymentId: string,
+  status: Payment["status"]
+) => {
+  try {
+    const response = await fetch("/api/admin/payments", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        paymentId,
+        status,
+      }),
+    });
 
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || "Failed to update payment status."
+      );
+    }
+
+    setPayments((currentPayments) =>
+      currentPayments.map((payment) =>
+        payment._id === paymentId
+          ? {
+              ...payment,
+              status: data.payment.status,
+              paidAt: data.payment.paidAt,
+              booking: {
+                ...payment.booking,
+                paymentStatus:
+                  data.payment.booking?.paymentStatus ||
+                  payment.booking.paymentStatus,
+                status:
+                  data.payment.booking?.status ||
+                  payment.booking.status,
+              },
+            }
+          : payment
+      )
+    );
+  } catch (error) {
+    console.error(
+      "Failed to update payment status:",
+      error
+    );
+
+    alert(
+      error instanceof Error
+        ? error.message
+        : "Failed to update payment status."
+    );
+  }
+};
   const totalPaid = payments
     .filter((payment) => payment.status === "paid")
     .reduce((total, payment) => total + payment.amount, 0);
@@ -364,14 +420,26 @@ export default function AdminPaymentsPage() {
                     </div>
 
                     <div>
-                      <p className="text-sm text-gray-500">
-                        Payment Status
-                      </p>
+  <p className="text-sm text-gray-500">
+    Payment Status
+  </p>
 
-                      <p className="mt-1 font-semibold capitalize text-gray-900">
-                        {payment.booking?.paymentStatus || "N/A"}
-                      </p>
-                    </div>
+  <select
+    value={payment.status}
+    onChange={(event) =>
+      handleStatusChange(
+        payment._id,
+        event.target.value as Payment["status"]
+      )
+    }
+    className="mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-gray-500"
+  >
+    <option value="pending">Pending</option>
+    <option value="paid">Paid</option>
+    <option value="failed">Failed</option>
+    <option value="refunded">Refunded</option>
+  </select>
+</div>
                   </div>
                 </div>
               </div>
