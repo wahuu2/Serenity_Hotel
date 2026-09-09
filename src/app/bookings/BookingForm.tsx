@@ -175,9 +175,7 @@ function BookingFormContent({
         return;
       }
 
-      router.push(
-        `/bookings/success?reference=${data.booking.bookingReference}`
-      );
+      router.push(`/payments/${data.booking._id}`);
     } catch (error) {
       console.error("Booking error:", error);
 

@@ -210,7 +210,7 @@ export async function POST(request: Request) {
         success: true,
         message: "Booking created successfully.",
         booking: {
-          id: booking._id,
+          _id: booking._id.toString(),
           bookingReference: booking.bookingReference,
           status: booking.status,
           totalAmount: booking.totalAmount,
