@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type Customer = {
   _id: string;
@@ -25,7 +26,9 @@ export default function AdminCustomersPage() {
         if (data.success) {
           setCustomers(data.customers);
         } else {
-          alert(data.message || "Failed to load customers");
+          alert(
+            data.message || "Failed to load customers"
+          );
         }
       } catch (error) {
         console.error(error);
@@ -40,14 +43,21 @@ export default function AdminCustomersPage() {
 
   const filteredCustomers = useMemo(() => {
     return customers.filter((customer) => {
-      const searchTerm = search.toLowerCase();
+      const searchTerm = search
+        .toLowerCase()
+        .trim();
 
       const matchesSearch =
-        customer.name.toLowerCase().includes(searchTerm) ||
-        customer.email.toLowerCase().includes(searchTerm);
+        customer.name
+          .toLowerCase()
+          .includes(searchTerm) ||
+        customer.email
+          .toLowerCase()
+          .includes(searchTerm);
 
       const matchesRole =
-        roleFilter === "all" || customer.role === roleFilter;
+        roleFilter === "all" ||
+        customer.role === roleFilter;
 
       return matchesSearch && matchesRole;
     });
@@ -61,9 +71,19 @@ export default function AdminCustomersPage() {
     (customer) => customer.role === "admin"
   ).length;
 
+  const hasActiveFilters =
+    search || roleFilter !== "all";
+
+  const clearFilters = () => {
+    setSearch("");
+    setRoleFilter("all");
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-10">
       <div className="mx-auto max-w-7xl">
+
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
             Customer Management
@@ -76,6 +96,7 @@ export default function AdminCustomersPage() {
 
         {/* Statistics */}
         <div className="mb-8 grid gap-4 sm:grid-cols-3">
+
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <p className="text-sm font-medium text-gray-500">
               Total Users
@@ -109,24 +130,55 @@ export default function AdminCustomersPage() {
 
         {/* Search and Filter */}
         <div className="mb-6 flex flex-col gap-4 rounded-xl bg-white p-5 shadow-sm md:flex-row">
+
           <input
             type="text"
             placeholder="Search by name or email..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+            className="flex-1 rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-900"
           />
 
           <select
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
+            onChange={(e) =>
+              setRoleFilter(e.target.value)
+            }
+            className="rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-900"
           >
-            <option value="all">All Roles</option>
-            <option value="guest">Guests</option>
-            <option value="admin">Administrators</option>
+            <option value="all">
+              All Roles
+            </option>
+
+            <option value="guest">
+              Guests
+            </option>
+
+            <option value="admin">
+              Administrators
+            </option>
           </select>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:border-gray-900 hover:text-gray-900"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
+
+        {/* Results Count */}
+        {!loading && (
+          <p className="mb-4 text-sm text-gray-500">
+            Showing {filteredCustomers.length} of{" "}
+            {customers.length} users
+          </p>
+        )}
 
         {/* Customers Table */}
         {loading ? (
@@ -135,14 +187,29 @@ export default function AdminCustomersPage() {
           </div>
         ) : filteredCustomers.length === 0 ? (
           <div className="rounded-xl bg-white p-8 text-center shadow-sm">
-            <p className="text-gray-600">
-              No customers found.
+            <p className="font-medium text-gray-900">
+              No customers found
             </p>
+
+            <p className="mt-1 text-sm text-gray-500">
+              No customers match your current search or filter.
+            </p>
+
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-4 rounded-md bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         ) : (
           <div className="overflow-hidden rounded-xl bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[700px]">
+
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
@@ -164,51 +231,62 @@ export default function AdminCustomersPage() {
                 </thead>
 
                 <tbody className="divide-y divide-gray-200">
-                  {filteredCustomers.map((customer) => (
-                    <tr
-                      key={customer._id}
-                      className="hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-5">
-                        <p className="font-semibold text-gray-900">
-                          {customer.name}
-                        </p>
-                      </td>
+                  {filteredCustomers.map(
+                    (customer) => (
+                      <tr
+                        key={customer._id}
+                        className="hover:bg-gray-50"
+                      >
 
-                      <td className="px-6 py-5 text-gray-600">
-                        {customer.email}
-                      </td>
+                        {/* Customer */}
+                        <td className="px-6 py-5">
+                          <Link
+                            href={`/admin/customers/${customer._id}`}
+                            className="font-semibold text-gray-900 transition hover:text-blue-600"
+                          >
+                            {customer.name}
+                          </Link>
+                        </td>
 
-                      <td className="px-6 py-5">
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                            customer.role === "admin"
-                              ? "bg-purple-100 text-purple-700"
-                              : "bg-blue-100 text-blue-700"
-                          }`}
-                        >
-                          {customer.role === "admin"
-                            ? "Administrator"
-                            : "Guest"}
-                        </span>
-                      </td>
+                        {/* Email */}
+                        <td className="px-6 py-5 text-gray-600">
+                          {customer.email}
+                        </td>
 
-                      <td className="px-6 py-5 text-gray-600">
-                        {new Date(
-                          customer.createdAt
-                        ).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
+                        {/* Role */}
+                        <td className="px-6 py-5">
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                              customer.role === "admin"
+                                ? "bg-purple-100 text-purple-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
+                          >
+                            {customer.role === "admin"
+                              ? "Administrator"
+                              : "Guest"}
+                          </span>
+                        </td>
+
+                        {/* Registered */}
+                        <td className="px-6 py-5 text-gray-600">
+                          {new Date(
+                            customer.createdAt
+                          ).toLocaleDateString(
+                            "en-KE"
+                          )}
+                        </td>
+
+                      </tr>
+                    )
+                  )}
                 </tbody>
+
               </table>
             </div>
           </div>
         )}
 
-        <p className="mt-4 text-sm text-gray-500">
-          Showing {filteredCustomers.length} of {customers.length} users
-        </p>
       </div>
     </main>
   );
