@@ -85,6 +85,55 @@ export default function BookingReceiptPage({
     window.print();
   }
 
+  function formatDate(date: string) {
+    return new Date(date).toLocaleDateString("en-KE", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  }
+
+  function formatStatus(status: string) {
+    if (!status) return "Unknown";
+
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  function getPaymentStatusClasses(status: string) {
+    switch (status) {
+      case "paid":
+        return "bg-green-100 text-green-700";
+
+      case "refunded":
+        return "bg-purple-100 text-purple-700";
+
+      case "unpaid":
+        return "bg-yellow-100 text-yellow-700";
+
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  }
+
+  function getBookingStatusClasses(status: string) {
+    switch (status) {
+      case "confirmed":
+        return "bg-green-100 text-green-700";
+
+      case "completed":
+        return "bg-blue-100 text-blue-700";
+
+      case "cancelled":
+        return "bg-red-100 text-red-700";
+
+      case "pending":
+        return "bg-yellow-100 text-yellow-700";
+
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  }
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
@@ -122,7 +171,7 @@ export default function BookingReceiptPage({
     <>
       <main className="min-h-screen bg-gray-100 px-6 py-10">
         <div className="mx-auto max-w-3xl">
-          {/* Action buttons */}
+          {/* Action Buttons */}
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:justify-between print:hidden">
             <Link
               href="/my-bookings"
@@ -156,7 +205,7 @@ export default function BookingReceiptPage({
               </p>
             </div>
 
-            {/* Booking reference */}
+            {/* Booking Reference */}
             <div className="mt-8 rounded-lg bg-gray-50 p-5 text-center">
               <p className="text-sm text-gray-500">
                 Booking Reference
@@ -167,7 +216,40 @@ export default function BookingReceiptPage({
               </p>
             </div>
 
-            {/* Guest information */}
+            {/* Confirmation Message */}
+            <div
+              className={`mt-6 rounded-lg p-5 text-center ${
+                booking.status === "cancelled"
+                  ? "bg-red-50"
+                  : booking.paymentStatus === "paid"
+                  ? "bg-green-50"
+                  : "bg-yellow-50"
+              }`}
+            >
+              <p
+                className={`font-semibold ${
+                  booking.status === "cancelled"
+                    ? "text-red-700"
+                    : booking.paymentStatus === "paid"
+                    ? "text-green-700"
+                    : "text-yellow-700"
+                }`}
+              >
+                {booking.status === "cancelled"
+                  ? "This booking has been cancelled."
+                  : booking.paymentStatus === "paid" &&
+                    booking.status === "confirmed"
+                  ? "Payment received. Your booking is confirmed."
+                  : booking.paymentStatus === "paid" &&
+                    booking.status === "completed"
+                  ? "Payment received. This booking has been completed."
+                  : booking.paymentStatus === "refunded"
+                  ? "This payment has been refunded."
+                  : "This booking is awaiting payment confirmation."}
+              </p>
+            </div>
+
+            {/* Guest Information */}
             <section className="mt-8">
               <h2 className="border-b border-gray-200 pb-3 text-lg font-bold text-gray-900">
                 Guest Information
@@ -178,6 +260,7 @@ export default function BookingReceiptPage({
                   <p className="text-sm text-gray-500">
                     Guest Name
                   </p>
+
                   <p className="mt-1 font-medium text-gray-900">
                     {booking.guestName}
                   </p>
@@ -187,6 +270,7 @@ export default function BookingReceiptPage({
                   <p className="text-sm text-gray-500">
                     Email
                   </p>
+
                   <p className="mt-1 break-all font-medium text-gray-900">
                     {booking.guestEmail}
                   </p>
@@ -196,6 +280,7 @@ export default function BookingReceiptPage({
                   <p className="text-sm text-gray-500">
                     Phone
                   </p>
+
                   <p className="mt-1 font-medium text-gray-900">
                     {booking.guestPhone}
                   </p>
@@ -205,6 +290,7 @@ export default function BookingReceiptPage({
                   <p className="text-sm text-gray-500">
                     Guests
                   </p>
+
                   <p className="mt-1 font-medium text-gray-900">
                     {booking.guests}
                   </p>
@@ -212,7 +298,7 @@ export default function BookingReceiptPage({
               </div>
             </section>
 
-            {/* Room information */}
+            {/* Reservation Details */}
             <section className="mt-8">
               <h2 className="border-b border-gray-200 pb-3 text-lg font-bold text-gray-900">
                 Reservation Details
@@ -245,13 +331,7 @@ export default function BookingReceiptPage({
                   </span>
 
                   <span className="text-right font-medium text-gray-900">
-                    {new Date(
-                      booking.checkIn
-                    ).toLocaleDateString("en-KE", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {formatDate(booking.checkIn)}
                   </span>
                 </div>
 
@@ -261,13 +341,7 @@ export default function BookingReceiptPage({
                   </span>
 
                   <span className="text-right font-medium text-gray-900">
-                    {new Date(
-                      booking.checkOut
-                    ).toLocaleDateString("en-KE", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {formatDate(booking.checkOut)}
                   </span>
                 </div>
 
@@ -295,23 +369,29 @@ export default function BookingReceiptPage({
               </div>
             </section>
 
-            {/* Payment information */}
+            {/* Payment Information */}
             <section className="mt-8">
               <h2 className="border-b border-gray-200 pb-3 text-lg font-bold text-gray-900">
                 Payment Information
               </h2>
 
               <div className="mt-5 space-y-4">
-                <div className="flex justify-between gap-4">
+                {/* Payment Status */}
+                <div className="flex items-center justify-between gap-4">
                   <span className="text-gray-500">
                     Payment Status
                   </span>
 
-                  <span className="font-semibold capitalize text-green-600">
-                    {booking.paymentStatus}
+                  <span
+                    className={`rounded-full px-3 py-1 text-sm font-semibold ${getPaymentStatusClasses(
+                      booking.paymentStatus
+                    )}`}
+                  >
+                    {formatStatus(booking.paymentStatus)}
                   </span>
                 </div>
 
+                {/* Payment Details */}
                 {booking.payment && (
                   <>
                     <div className="flex justify-between gap-4">
@@ -344,20 +424,33 @@ export default function BookingReceiptPage({
 
                       <span className="font-medium text-gray-900">
                         {booking.payment.paidAt
-                          ? new Date(
+                          ? formatDate(
                               booking.payment.paidAt
-                            ).toLocaleDateString(
-                              "en-KE",
-                              {
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              }
                             )
                           : "Not paid"}
                       </span>
                     </div>
+
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-500">
+                        Amount Paid
+                      </span>
+
+                      <span className="font-semibold text-gray-900">
+                        {booking.payment.currency}{" "}
+                        {booking.payment.amount.toLocaleString()}
+                      </span>
+                    </div>
                   </>
+                )}
+
+                {!booking.payment && (
+                  <div className="rounded-lg bg-yellow-50 p-4">
+                    <p className="text-sm font-medium text-yellow-700">
+                      No payment has been recorded for this
+                      booking.
+                    </p>
+                  </div>
                 )}
               </div>
             </section>
@@ -377,33 +470,33 @@ export default function BookingReceiptPage({
             </section>
 
             {/* Status */}
-            <div className="mt-8 flex flex-col gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-500">
-                  Booking Status
-                </p>
+            <section className="mt-8 border-t border-gray-200 pt-6">
+              <div className="flex flex-col gap-6 sm:flex-row sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Booking Status
+                  </p>
 
-                <p className="mt-1 font-semibold capitalize text-gray-900">
-                  {booking.status}
-                </p>
+                  <span
+                    className={`mt-1 inline-block rounded-full px-3 py-1 text-sm font-semibold ${getBookingStatusClasses(
+                      booking.status
+                    )}`}
+                  >
+                    {formatStatus(booking.status)}
+                  </span>
+                </div>
+
+                <div className="sm:text-right">
+                  <p className="text-sm text-gray-500">
+                    Booking Date
+                  </p>
+
+                  <p className="mt-1 font-medium text-gray-900">
+                    {formatDate(booking.createdAt)}
+                  </p>
+                </div>
               </div>
-
-              <div className="sm:text-right">
-                <p className="text-sm text-gray-500">
-                  Booking Date
-                </p>
-
-                <p className="mt-1 font-medium text-gray-900">
-                  {new Date(
-                    booking.createdAt
-                  ).toLocaleDateString("en-KE", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-              </div>
-            </div>
+            </section>
 
             {/* Footer */}
             <div className="mt-10 border-t border-gray-200 pt-6 text-center">
