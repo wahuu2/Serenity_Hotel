@@ -72,10 +72,10 @@ export default async function RoomsPage() {
           </div>
 
           <Link
-            href="/bookings"
+            href="/rooms"
             className="inline-flex w-fit border-b border-gray-900 pb-1 text-sm font-semibold text-gray-900 transition hover:border-amber-700 hover:text-amber-700"
           >
-            Book your stay →
+            Explore rooms →
           </Link>
         </div>
       </section>
@@ -114,7 +114,9 @@ export default async function RoomsPage() {
                   key={room._id.toString()}
                   className="group overflow-hidden bg-white"
                 >
-                  {/* Image */}
+                  {/* =================================================
+                      ROOM IMAGE
+                  ================================================= */}
                   <Link href={`/rooms/${room._id.toString()}`}>
                     <div className="relative h-72 overflow-hidden bg-gray-200">
                       <img
@@ -128,10 +130,18 @@ export default async function RoomsPage() {
                       <div className="absolute left-5 top-5 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-900">
                         {room.type}
                       </div>
+
+                      {!room.available && (
+                        <div className="absolute right-5 top-5 bg-red-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-white">
+                          Unavailable
+                        </div>
+                      )}
                     </div>
                   </Link>
 
-                  {/* Content */}
+                  {/* =================================================
+                      ROOM CONTENT
+                  ================================================= */}
                   <div className="p-7">
                     <div className="flex items-start justify-between gap-4">
                       <h2 className="text-2xl font-semibold text-gray-900">
@@ -143,7 +153,9 @@ export default async function RoomsPage() {
                           KSh {room.price.toLocaleString()}
                         </p>
 
-                        <p className="text-xs text-gray-500">per night</p>
+                        <p className="text-xs text-gray-500">
+                          per night
+                        </p>
                       </div>
                     </div>
 
@@ -165,7 +177,9 @@ export default async function RoomsPage() {
                       <span>Comfortable stay</span>
                     </div>
 
-                    {/* Actions */}
+                    {/* =================================================
+                        ACTIONS
+                    ================================================= */}
                     <div className="mt-6 flex items-center justify-between gap-4">
                       <Link
                         href={`/rooms/${room._id.toString()}`}
@@ -174,12 +188,18 @@ export default async function RoomsPage() {
                         View Room →
                       </Link>
 
-                      <Link
-                        href="/bookings"
-                        className="bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
-                      >
-                        Book Now
-                      </Link>
+                      {room.available ? (
+                        <Link
+                          href={`/bookings?room=${room._id.toString()}`}
+                          className="bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-700"
+                        >
+                          Book Now
+                        </Link>
+                      ) : (
+                        <span className="cursor-not-allowed bg-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-500">
+                          Unavailable
+                        </span>
+                      )}
                     </div>
                   </div>
                 </article>
@@ -215,6 +235,7 @@ export default async function RoomsPage() {
                   <p className="text-lg font-semibold text-gray-900">
                     Comfortable spaces
                   </p>
+
                   <p className="mt-2 text-sm leading-6 text-gray-600">
                     Rooms designed for rest, privacy, and relaxation.
                   </p>
@@ -224,6 +245,7 @@ export default async function RoomsPage() {
                   <p className="text-lg font-semibold text-gray-900">
                     Warm hospitality
                   </p>
+
                   <p className="mt-2 text-sm leading-6 text-gray-600">
                     Thoughtful service from arrival to departure.
                   </p>
@@ -233,6 +255,7 @@ export default async function RoomsPage() {
                   <p className="text-lg font-semibold text-gray-900">
                     Dining on site
                   </p>
+
                   <p className="mt-2 text-sm leading-6 text-gray-600">
                     Enjoy delicious meals without leaving the hotel.
                   </p>
@@ -242,6 +265,7 @@ export default async function RoomsPage() {
                   <p className="text-lg font-semibold text-gray-900">
                     Easy booking
                   </p>
+
                   <p className="mt-2 text-sm leading-6 text-gray-600">
                     Find your room and make your reservation with ease.
                   </p>
@@ -280,10 +304,10 @@ export default async function RoomsPage() {
 
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
             <Link
-              href="/bookings"
+              href="/rooms"
               className="bg-white px-7 py-3.5 text-sm font-semibold text-gray-900 transition hover:bg-gray-100"
             >
-              Book Your Stay
+              Explore Rooms
             </Link>
 
             <Link
