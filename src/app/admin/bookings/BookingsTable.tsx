@@ -36,29 +36,29 @@ type BookingsTableProps = {
 function getStatusClasses(status: string) {
   switch (status) {
     case "confirmed":
-      return "bg-green-100 text-green-700";
+      return "border border-green-200 bg-green-50 text-green-700";
 
     case "completed":
-      return "bg-blue-100 text-blue-700";
+      return "border border-blue-200 bg-blue-50 text-blue-700";
 
     case "cancelled":
-      return "bg-red-100 text-red-700";
+      return "border border-red-200 bg-red-50 text-red-700";
 
     default:
-      return "bg-yellow-100 text-yellow-700";
+      return "border border-amber-200 bg-amber-50 text-amber-700";
   }
 }
 
 function getPaymentStatusClasses(paymentStatus: string) {
   switch (paymentStatus) {
     case "paid":
-      return "bg-green-100 text-green-700";
+      return "border border-green-200 bg-green-50 text-green-700";
 
     case "refunded":
-      return "bg-purple-100 text-purple-700";
+      return "border border-purple-200 bg-purple-50 text-purple-700";
 
     default:
-      return "bg-yellow-100 text-yellow-700";
+      return "border border-amber-200 bg-amber-50 text-amber-700";
   }
 }
 
@@ -66,6 +66,14 @@ function formatStatus(status: string) {
   if (!status) return "Unknown";
 
   return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString("en-KE", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default function BookingsTable({
@@ -83,12 +91,8 @@ export default function BookingsTable({
       booking.bookingReference
         .toLowerCase()
         .includes(searchValue) ||
-      booking.guestName
-        .toLowerCase()
-        .includes(searchValue) ||
-      booking.guestEmail
-        .toLowerCase()
-        .includes(searchValue);
+      booking.guestName.toLowerCase().includes(searchValue) ||
+      booking.guestEmail.toLowerCase().includes(searchValue);
 
     const matchesStatus =
       statusFilter === "all" ||
@@ -122,143 +126,195 @@ export default function BookingsTable({
   return (
     <>
       {/* Filters */}
-      <div className="mb-6 grid gap-4 md:grid-cols-[1fr_220px_220px_auto]">
-        {/* Search */}
-        <div>
-          <label
-            htmlFor="booking-search"
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            Search bookings
-          </label>
+      <div className="rounded-2xl border border-gray-200 bg-[#faf9f7] p-4 sm:p-5">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_200px_200px_auto]">
+          {/* Search */}
+          <div>
+            <label
+              htmlFor="booking-search"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-gray-500"
+            >
+              Search bookings
+            </label>
 
-          <input
-            id="booking-search"
-            type="text"
-            value={search}
-            onChange={(event) =>
-              setSearch(event.target.value)
-            }
-            placeholder="Search reference, guest name or email..."
-            className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-gray-900"
-          />
+            <div className="relative">
+              <input
+                id="booking-search"
+                type="text"
+                value={search}
+                onChange={(event) =>
+                  setSearch(event.target.value)
+                }
+                placeholder="Reference, guest name or email..."
+                className="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+              />
+            </div>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label
+              htmlFor="status-filter"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-gray-500"
+            >
+              Booking status
+            </label>
+
+            <select
+              id="status-filter"
+              value={statusFilter}
+              onChange={(event) =>
+                setStatusFilter(event.target.value)
+              }
+              className="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+            >
+              <option value="all">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          {/* Date Filter */}
+          <div>
+            <label
+              htmlFor="date-filter"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-gray-500"
+            >
+              Check-in date
+            </label>
+
+            <input
+              id="date-filter"
+              type="date"
+              value={dateFilter}
+              onChange={(event) =>
+                setDateFilter(event.target.value)
+              }
+              className="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+            />
+          </div>
+
+          {/* Clear Filters */}
+          <div className="flex items-end">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
         </div>
+      </div>
 
-        {/* Status Filter */}
-        <div>
-          <label
-            htmlFor="status-filter"
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            Filter by status
-          </label>
+      {/* Results Count */}
+      <div className="flex flex-col gap-1 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-gray-500">
+          Showing{" "}
+          <span className="font-semibold text-gray-900">
+            {filteredBookings.length}
+          </span>{" "}
+          of{" "}
+          <span className="font-semibold text-gray-900">
+            {bookings.length}
+          </span>{" "}
+          bookings
+        </p>
 
-          <select
-            id="status-filter"
-            value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(event.target.value)
-            }
-            className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-gray-900"
-          >
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
+        {hasActiveFilters && (
+          <p className="text-xs text-amber-700">
+            Filters are active
+          </p>
+        )}
+      </div>
 
-        {/* Date Filter */}
-        <div>
-          <label
-            htmlFor="date-filter"
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            Check-in Date
-          </label>
+      {/* Empty State */}
+      {filteredBookings.length === 0 ? (
+        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-14 text-center shadow-sm">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-5 w-5 text-gray-500"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.04 6.04a7.5 7.5 0 0 0 10.61 10.61Z"
+              />
+            </svg>
+          </div>
 
-          <input
-            id="date-filter"
-            type="date"
-            value={dateFilter}
-            onChange={(event) =>
-              setDateFilter(event.target.value)
-            }
-            className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-gray-900"
-          />
-        </div>
+          <h3 className="mt-4 text-lg font-semibold text-gray-950">
+            No matching bookings
+          </h3>
 
-        {/* Clear Filters */}
-        <div className="flex items-end">
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">
+            No reservations match your current search or filters.
+            Try changing your search criteria.
+          </p>
+
           {hasActiveFilters && (
             <button
               type="button"
               onClick={clearFilters}
-              className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-gray-900 hover:text-gray-900"
+              className="mt-5 rounded-lg bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
             >
               Clear Filters
             </button>
           )}
         </div>
-      </div>
-
-      {/* Results Count */}
-      <p className="mb-4 text-sm text-gray-500">
-        Showing {filteredBookings.length} of{" "}
-        {bookings.length} bookings
-      </p>
-
-      {/* Empty State */}
-      {filteredBookings.length === 0 ? (
-        <div className="rounded-xl bg-white p-12 text-center shadow-sm">
-          <h3 className="text-xl font-semibold text-gray-900">
-            No matching bookings
-          </h3>
-
-          <p className="mt-2 text-gray-500">
-            Try changing your search, status, or date filter.
-          </p>
-        </div>
       ) : (
-        <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          {/* Mobile Scroll Hint */}
+          <div className="border-b border-gray-200 bg-[#faf9f7] px-4 py-3 text-xs text-gray-500 sm:hidden">
+            Swipe horizontally to view all booking details.
+          </div>
+
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-[1200px] divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Booking
                   </th>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Guest
                   </th>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Room
                   </th>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Stay
                   </th>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Guests
                   </th>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Total
                   </th>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Status
                   </th>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Payment
                   </th>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                     Actions
                   </th>
                 </tr>
@@ -268,28 +324,26 @@ export default function BookingsTable({
                 {filteredBookings.map((booking) => (
                   <tr
                     key={booking._id}
-                    className="hover:bg-gray-50"
+                    className="transition hover:bg-[#faf9f7]"
                   >
                     {/* Booking */}
-                    <td className="whitespace-nowrap px-6 py-5">
-                      <p className="font-semibold text-gray-900">
+                    <td className="whitespace-nowrap px-5 py-5 align-top">
+                      <p className="font-semibold text-gray-950">
                         {booking.bookingReference}
                       </p>
 
                       <p className="mt-1 text-xs text-gray-500">
-                        {new Date(
-                          booking.createdAt
-                        ).toLocaleDateString("en-KE")}
+                        Created {formatDate(booking.createdAt)}
                       </p>
                     </td>
 
                     {/* Guest */}
-                    <td className="px-6 py-5">
-                      <p className="font-medium text-gray-900">
+                    <td className="max-w-[240px] px-5 py-5 align-top">
+                      <p className="font-medium text-gray-950">
                         {booking.guestName}
                       </p>
 
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="mt-1 truncate text-sm text-gray-500">
                         {booking.guestEmail}
                       </p>
 
@@ -298,7 +352,7 @@ export default function BookingsTable({
                       </p>
 
                       {booking.user && (
-                        <p className="mt-1 text-xs text-gray-400">
+                        <p className="mt-2 text-xs text-gray-400">
                           Account:{" "}
                           {booking.user.name ||
                             booking.user.email}
@@ -307,34 +361,35 @@ export default function BookingsTable({
                     </td>
 
                     {/* Room */}
-                    <td className="whitespace-nowrap px-6 py-5">
-                      <p className="font-medium text-gray-900">
-                        {booking.room?.name ||
-                          "Unknown Room"}
+                    <td className="whitespace-nowrap px-5 py-5 align-top">
+                      <p className="font-medium text-gray-950">
+                        {booking.room?.name || "Unknown Room"}
                       </p>
 
-                      <p className="mt-1 text-sm text-gray-500">
-                        {booking.room?.type || ""}
-                      </p>
+                      {booking.room?.type && (
+                        <p className="mt-1 text-sm text-gray-500">
+                          {booking.room.type}
+                        </p>
+                      )}
                     </td>
 
                     {/* Stay */}
-                    <td className="whitespace-nowrap px-6 py-5">
+                    <td className="whitespace-nowrap px-5 py-5 align-top">
                       <p className="text-sm text-gray-700">
-                        Check-in:{" "}
-                        {new Date(
-                          booking.checkIn
-                        ).toLocaleDateString("en-KE")}
+                        <span className="text-gray-500">
+                          Check-in:
+                        </span>{" "}
+                        {formatDate(booking.checkIn)}
                       </p>
 
                       <p className="mt-1 text-sm text-gray-700">
-                        Check-out:{" "}
-                        {new Date(
-                          booking.checkOut
-                        ).toLocaleDateString("en-KE")}
+                        <span className="text-gray-500">
+                          Check-out:
+                        </span>{" "}
+                        {formatDate(booking.checkOut)}
                       </p>
 
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-2 text-xs font-medium text-gray-500">
                         {booking.nights}{" "}
                         {booking.nights === 1
                           ? "night"
@@ -343,22 +398,24 @@ export default function BookingsTable({
                     </td>
 
                     {/* Guests */}
-                    <td className="whitespace-nowrap px-6 py-5 text-sm text-gray-700">
+                    <td className="whitespace-nowrap px-5 py-5 align-top text-sm text-gray-700">
                       {booking.guests}
                     </td>
 
                     {/* Total */}
-                    <td className="whitespace-nowrap px-6 py-5">
-                      <p className="font-semibold text-gray-900">
+                    <td className="whitespace-nowrap px-5 py-5 align-top">
+                      <p className="font-semibold text-gray-950">
                         KSh{" "}
-                        {booking.totalAmount.toLocaleString()}
+                        {booking.totalAmount.toLocaleString(
+                          "en-KE"
+                        )}
                       </p>
                     </td>
 
                     {/* Booking Status */}
-                    <td className="whitespace-nowrap px-6 py-5">
+                    <td className="whitespace-nowrap px-5 py-5 align-top">
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusClasses(
+                        className={`inline-flex rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusClasses(
                           booking.status
                         )}`}
                       >
@@ -367,9 +424,9 @@ export default function BookingsTable({
                     </td>
 
                     {/* Payment Status */}
-                    <td className="whitespace-nowrap px-6 py-5">
+                    <td className="whitespace-nowrap px-5 py-5 align-top">
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getPaymentStatusClasses(
+                        className={`inline-flex rounded-full px-3 py-1.5 text-xs font-semibold ${getPaymentStatusClasses(
                           booking.paymentStatus
                         )}`}
                       >
@@ -380,8 +437,8 @@ export default function BookingsTable({
                     </td>
 
                     {/* Actions */}
-                    <td className="whitespace-nowrap px-6 py-5">
-                      <div className="flex flex-col gap-2">
+                    <td className="whitespace-nowrap px-5 py-5 align-top">
+                      <div className="flex min-w-[130px] flex-col gap-2">
                         <BookingActions
                           bookingId={booking._id}
                           status={booking.status}
@@ -390,7 +447,8 @@ export default function BookingsTable({
                         <Link
                           href={`/bookings/${booking.bookingReference}/receipt`}
                           target="_blank"
-                          className="rounded-md border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700 transition hover:border-gray-900 hover:text-gray-900"
+                          rel="noopener noreferrer"
+                          className="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
                         >
                           View Receipt
                         </Link>
