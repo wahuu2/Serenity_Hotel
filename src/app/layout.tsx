@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import SyncUser from "@/components/SyncUser";
+import SiteChrome from "@/components/SiteChrome";
 
 import "./globals.css";
 
@@ -81,11 +80,9 @@ export default function RootLayout({
         <body className="min-h-screen w-full overflow-x-hidden bg-background text-foreground antialiased">
           <SyncUser />
 
-          <Navbar />
-
-          {children}
-
-          <Footer />
+          <SiteChrome>
+            {children}
+          </SiteChrome>
         </body>
       </html>
     </ClerkProvider>
