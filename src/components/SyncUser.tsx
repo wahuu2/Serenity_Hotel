@@ -11,6 +11,8 @@ export default function SyncUser() {
       return;
     }
 
+    let cancelled = false;
+
     async function syncUser() {
       try {
         const response = await fetch("/api/users/sync", {
@@ -19,6 +21,10 @@ export default function SyncUser() {
 
         const data = await response.json();
 
+        if (cancelled) {
+          return;
+        }
+
         if (!response.ok) {
           console.error("User sync failed:", data.message);
           return;
@@ -26,11 +32,19 @@ export default function SyncUser() {
 
         console.log("User sync successful:", data);
       } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
         console.error("User sync error:", error);
       }
     }
 
     syncUser();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isSignedIn]);
 
   return null;
