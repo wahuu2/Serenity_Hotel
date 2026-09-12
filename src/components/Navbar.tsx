@@ -13,17 +13,34 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur-md">
-      <nav className="mx-auto flex min-h-[72px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
+      <nav className="mx-auto flex min-h-[78px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
         {/* =========================================================
-            LOGO
+            BRAND / LOGO
         ========================================================= */}
         <Link
           href="/"
           onClick={closeMenu}
-          className="shrink-0 text-xl font-semibold tracking-tight text-gray-950 sm:text-2xl"
+          className="flex shrink-0 items-center gap-3"
         >
-          Serenity
-          <span className="ml-1 font-normal text-amber-700">Hotel</span>
+          {/* Hotel Logo */}
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden sm:h-14 sm:w-14">
+            <img
+              src="/logo.png"
+              alt="Serenity Hotel logo"
+              className="h-full w-full object-contain"
+            />
+          </div>
+
+          {/* Brand Name */}
+          <div className="flex flex-col justify-center leading-none">
+            <span className="text-[22px] font-semibold tracking-[0.08em] text-gray-950 sm:text-[26px]">
+              SERENITY
+            </span>
+
+            <span className="mt-1 text-[10px] font-semibold tracking-[0.35em] text-amber-700 sm:text-[11px]">
+              HOTEL
+            </span>
+          </div>
         </Link>
 
         {/* =========================================================
@@ -41,7 +58,7 @@ export default function Navbar() {
             href="/rooms"
             className="text-sm font-medium text-gray-700 transition hover:text-amber-700"
           >
-            Rooms
+            Rooms & Suites
           </Link>
 
           <Link
@@ -55,7 +72,7 @@ export default function Navbar() {
             href="/services"
             className="text-sm font-medium text-gray-700 transition hover:text-amber-700"
           >
-            Services
+            Hotel Services
           </Link>
 
           <Show when="signed-in">
@@ -78,38 +95,16 @@ export default function Navbar() {
             href="/contact"
             className="text-sm font-medium text-gray-700 transition hover:text-amber-700"
           >
-            Contact
+            Contact Us
           </Link>
 
           {/* Book Now */}
           <Link
             href="/bookings"
-            className="bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+            className="bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-700"
           >
             Book Now
           </Link>
-
-          {/* Logged Out */}
-          <Show when="signed-out">
-            <Link
-              href="/sign-in"
-              className="text-sm font-semibold text-gray-700 transition hover:text-black"
-            >
-              Sign In
-            </Link>
-
-            <Link
-              href="/sign-up"
-              className="border border-gray-900 px-5 py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-gray-950 hover:text-white"
-            >
-              Sign Up
-            </Link>
-          </Show>
-
-          {/* Logged In */}
-          <Show when="signed-in">
-            <UserButton />
-          </Show>
         </div>
 
         {/* =========================================================
@@ -123,7 +118,9 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              menuOpen ? "Close navigation menu" : "Open navigation menu"
+            }
             aria-expanded={menuOpen}
             className="flex h-10 w-10 items-center justify-center border border-gray-200 text-gray-900 transition hover:border-gray-900"
           >
@@ -231,7 +228,7 @@ export default function Navbar() {
               <Link
                 href="/bookings"
                 onClick={closeMenu}
-                className="mt-5 bg-gray-950 px-6 py-3.5 text-center text-sm font-semibold text-white transition hover:bg-gray-800"
+                className="mt-5 bg-gray-950 px-6 py-3.5 text-center text-sm font-semibold text-white transition hover:bg-amber-700"
               >
                 Book Your Stay
               </Link>

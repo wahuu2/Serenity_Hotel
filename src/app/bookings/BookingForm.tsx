@@ -75,6 +75,8 @@ function BookingFormContent({
     fetchRoom();
   }, [roomId]);
 
+  const today = new Date().toISOString().split("T")[0];
+
   const nights = useMemo(() => {
     if (!checkIn || !checkOut) {
       return 0;
@@ -189,23 +191,30 @@ function BookingFormContent({
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
-        <p className="text-gray-600">
-          Loading booking details...
-        </p>
+      <main className="flex min-h-screen items-center justify-center bg-[#f6f3ee] px-6">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900" />
+          <p className="mt-4 text-sm text-gray-600">
+            Preparing your reservation...
+          </p>
+        </div>
       </main>
     );
   }
 
   if (!room) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
-        <div className="max-w-md text-center">
-          <h1 className="text-3xl font-bold text-gray-900">
+      <main className="flex min-h-screen items-center justify-center bg-[#f6f3ee] px-6">
+        <div className="w-full max-w-md bg-white p-8 text-center shadow-sm md:p-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-700">
+            Serenity Hotel
+          </p>
+
+          <h1 className="mt-4 text-3xl font-semibold text-gray-900">
             Select a Room
           </h1>
 
-          <p className="mt-3 text-gray-600">
+          <p className="mt-4 leading-7 text-gray-600">
             {error ||
               "Please select a room before making a booking."}
           </p>
@@ -213,7 +222,7 @@ function BookingFormContent({
           <button
             type="button"
             onClick={() => router.push("/rooms")}
-            className="mt-6 rounded-md bg-gray-900 px-6 py-3 font-semibold text-white transition hover:bg-gray-700"
+            className="mt-7 w-full bg-gray-950 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-amber-700"
           >
             Explore Rooms
           </button>
@@ -223,304 +232,438 @@ function BookingFormContent({
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <section className="bg-gray-900 px-6 py-16 text-center text-white">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gray-300">
-          Reservations
-        </p>
+    <main className="min-h-screen bg-[#f6f3ee]">
+      {/* =========================================================
+          PAGE HERO
+      ========================================================= */}
+      <section className="relative overflow-hidden bg-gray-950 px-6 py-20 text-white md:py-24">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(180,130,50,0.16),transparent_35%)]" />
 
-        <h1 className="mt-3 text-4xl font-bold md:text-5xl">
-          Book Your Stay
-        </h1>
+        <div className="relative mx-auto max-w-7xl">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-amber-400">
+              Reservations
+            </p>
 
-        <p className="mx-auto mt-5 max-w-2xl text-gray-300">
-          Complete the form below to reserve your room at
-          Serenity Hotel.
-        </p>
+            <h1 className="mt-5 text-4xl font-semibold leading-tight md:text-6xl">
+              Reserve your stay.
+            </h1>
+
+            <p className="mt-5 max-w-2xl text-base leading-7 text-gray-300 md:text-lg md:leading-8">
+              Complete your reservation and take the next step toward a
+              comfortable stay at Serenity Hotel.
+            </p>
+          </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid gap-10 lg:grid-cols-3">
+      {/* =========================================================
+          BOOKING CONTENT
+      ========================================================= */}
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 md:py-16 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-[1fr_380px] lg:items-start lg:gap-12">
+          {/* =====================================================
+              BOOKING FORM
+          ===================================================== */}
           <form
             onSubmit={handleSubmit}
-            className="rounded-xl bg-white p-8 shadow-sm lg:col-span-2"
+            className="bg-white shadow-sm"
           >
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Guest Details
-              </h2>
+            {/* Guest Details */}
+            <div className="border-b border-gray-200 p-6 sm:p-8 md:p-10">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-700">
+                  Step 01
+                </p>
 
-              <p className="mt-2 text-gray-600">
-                Your account details have been filled in
-                automatically.
+                <h2 className="mt-3 text-2xl font-semibold text-gray-900 md:text-3xl">
+                  Guest details
+                </h2>
+
+                <p className="mt-3 max-w-xl text-sm leading-6 text-gray-600">
+                  Tell us who will be staying. Your account information has
+                  already been filled in for you.
+                </p>
+              </div>
+
+              <div className="mt-8 grid gap-6 md:grid-cols-2">
+                {/* Full Name */}
+                <div>
+                  <label
+                    htmlFor="guestName"
+                    className="mb-2 block text-sm font-semibold text-gray-800"
+                  >
+                    Full Name
+                  </label>
+
+                  <input
+                    id="guestName"
+                    type="text"
+                    value={guestName}
+                    onChange={(event) =>
+                      setGuestName(event.target.value)
+                    }
+                    placeholder="Enter your full name"
+                    required
+                    className="w-full border border-gray-300 bg-white px-4 py-3.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                  />
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label
+                    htmlFor="guestPhone"
+                    className="mb-2 block text-sm font-semibold text-gray-800"
+                  >
+                    Phone Number
+                  </label>
+
+                  <input
+                    id="guestPhone"
+                    type="tel"
+                    value={guestPhone}
+                    onChange={(event) =>
+                      setGuestPhone(event.target.value)
+                    }
+                    placeholder="+254 700 000 000"
+                    required
+                    className="w-full border border-gray-300 bg-white px-4 py-3.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="mt-6">
+                <label
+                  htmlFor="guestEmail"
+                  className="mb-2 block text-sm font-semibold text-gray-800"
+                >
+                  Email Address
+                </label>
+
+                <input
+                  id="guestEmail"
+                  type="email"
+                  value={guestEmail}
+                  readOnly
+                  required
+                  className="w-full cursor-not-allowed border border-gray-200 bg-gray-100 px-4 py-3.5 text-sm text-gray-600 outline-none"
+                />
+
+                <p className="mt-2 text-xs text-gray-500">
+                  This email is connected to your signed-in account.
+                </p>
+              </div>
+            </div>
+
+            {/* Reservation Details */}
+            <div className="p-6 sm:p-8 md:p-10">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-700">
+                  Step 02
+                </p>
+
+                <h2 className="mt-3 text-2xl font-semibold text-gray-900 md:text-3xl">
+                  Your reservation
+                </h2>
+
+                <p className="mt-3 max-w-xl text-sm leading-6 text-gray-600">
+                  Select your dates and the number of guests for this room.
+                </p>
+              </div>
+
+              {/* Dates */}
+              <div className="mt-8 grid gap-6 md:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="checkIn"
+                    className="mb-2 block text-sm font-semibold text-gray-800"
+                  >
+                    Check-in Date
+                  </label>
+
+                  <input
+                    id="checkIn"
+                    type="date"
+                    value={checkIn}
+                    onChange={(event) =>
+                      setCheckIn(event.target.value)
+                    }
+                    min={today}
+                    required
+                    className="w-full border border-gray-300 bg-white px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                  />
+
+                  <p className="mt-2 text-xs text-gray-500">
+                    Your arrival date
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="checkOut"
+                    className="mb-2 block text-sm font-semibold text-gray-800"
+                  >
+                    Check-out Date
+                  </label>
+
+                  <input
+                    id="checkOut"
+                    type="date"
+                    value={checkOut}
+                    onChange={(event) =>
+                      setCheckOut(event.target.value)
+                    }
+                    min={checkIn || today}
+                    required
+                    className="w-full border border-gray-300 bg-white px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                  />
+
+                  <p className="mt-2 text-xs text-gray-500">
+                    Your departure date
+                  </p>
+                </div>
+              </div>
+
+              {/* Guests */}
+              <div className="mt-6">
+                <label
+                  htmlFor="guests"
+                  className="mb-2 block text-sm font-semibold text-gray-800"
+                >
+                  Number of Guests
+                </label>
+
+                <select
+                  id="guests"
+                  value={guests}
+                  onChange={(event) =>
+                    setGuests(Number(event.target.value))
+                  }
+                  className="w-full border border-gray-300 bg-white px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                >
+                  {Array.from(
+                    { length: room.capacity },
+                    (_, index) => index + 1
+                  ).map((number) => (
+                    <option key={number} value={number}>
+                      {number}{" "}
+                      {number === 1 ? "Guest" : "Guests"}
+                    </option>
+                  ))}
+                </select>
+
+                <p className="mt-2 text-xs text-gray-500">
+                  Maximum capacity: {room.capacity} guests
+                </p>
+              </div>
+
+              {/* Live Total */}
+              <div className="mt-8 border border-gray-200 bg-[#f6f3ee] p-5 sm:p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">
+                      Estimated stay
+                    </p>
+
+                    <p className="mt-1 text-xs text-gray-500">
+                      {nights > 0
+                        ? `${nights} ${
+                            nights === 1 ? "night" : "nights"
+                          } × KSh ${room.price.toLocaleString()}`
+                        : "Select your dates to calculate your stay"}
+                    </p>
+                  </div>
+
+                  <p className="text-2xl font-semibold text-gray-900">
+                    KSh {total.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div
+                  role="alert"
+                  className="mt-6 border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-700"
+                >
+                  <p className="font-semibold">
+                    Unable to continue
+                  </p>
+
+                  <p className="mt-1">
+                    {error}
+                  </p>
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={submitting || nights === 0}
+                className="mt-8 w-full bg-gray-950 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+              >
+                {submitting
+                  ? "Creating Booking..."
+                  : "Continue to Payment"}
+              </button>
+
+              <p className="mt-4 text-center text-xs leading-5 text-gray-500">
+                Your reservation will be created before proceeding to
+                payment.
               </p>
             </div>
-
-            <div className="mt-8 grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="guestName"
-                  className="mb-2 block text-sm font-medium text-gray-700"
-                >
-                  Full Name
-                </label>
-
-                <input
-                  id="guestName"
-                  type="text"
-                  value={guestName}
-                  onChange={(event) =>
-                    setGuestName(event.target.value)
-                  }
-                  placeholder="Enter your full name"
-                  required
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="guestPhone"
-                  className="mb-2 block text-sm font-medium text-gray-700"
-                >
-                  Phone Number
-                </label>
-
-                <input
-                  id="guestPhone"
-                  type="tel"
-                  value={guestPhone}
-                  onChange={(event) =>
-                    setGuestPhone(event.target.value)
-                  }
-                  placeholder="+254 700 000 000"
-                  required
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-                />
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <label
-                htmlFor="guestEmail"
-                className="mb-2 block text-sm font-medium text-gray-700"
-              >
-                Email Address
-              </label>
-
-              <input
-                id="guestEmail"
-                type="email"
-                value={guestEmail}
-                readOnly
-                required
-                className="w-full cursor-not-allowed rounded-md border border-gray-300 bg-gray-100 px-4 py-3 text-gray-600 outline-none"
-              />
-
-              <p className="mt-2 text-xs text-gray-500">
-                This email comes from your signed-in account.
-              </p>
-            </div>
-
-            <h2 className="mt-10 text-2xl font-bold text-gray-900">
-              Reservation Details
-            </h2>
-
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="checkIn"
-                  className="mb-2 block text-sm font-medium text-gray-700"
-                >
-                  Check-in Date
-                </label>
-
-                <input
-                  id="checkIn"
-                  type="date"
-                  value={checkIn}
-                  onChange={(event) =>
-                    setCheckIn(event.target.value)
-                  }
-                  min={new Date().toISOString().split("T")[0]}
-                  required
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="checkOut"
-                  className="mb-2 block text-sm font-medium text-gray-700"
-                >
-                  Check-out Date
-                </label>
-
-                <input
-                  id="checkOut"
-                  type="date"
-                  value={checkOut}
-                  onChange={(event) =>
-                    setCheckOut(event.target.value)
-                  }
-                  min={
-                    checkIn ||
-                    new Date().toISOString().split("T")[0]
-                  }
-                  required
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-                />
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <label
-                htmlFor="guests"
-                className="mb-2 block text-sm font-medium text-gray-700"
-              >
-                Number of Guests
-              </label>
-
-              <select
-                id="guests"
-                value={guests}
-                onChange={(event) =>
-                  setGuests(Number(event.target.value))
-                }
-                className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-              >
-                {Array.from(
-                  { length: room.capacity },
-                  (_, index) => index + 1
-                ).map((number) => (
-                  <option key={number} value={number}>
-                    {number}{" "}
-                    {number === 1 ? "Guest" : "Guests"}
-                  </option>
-                ))}
-              </select>
-
-              <p className="mt-2 text-xs text-gray-500">
-                Maximum capacity: {room.capacity} guests
-              </p>
-            </div>
-
-            {error && (
-              <div className="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={submitting || nights === 0}
-              className="mt-8 w-full rounded-md bg-gray-900 px-6 py-3 font-semibold text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-            >
-              {submitting
-                ? "Creating Booking..."
-                : "Confirm Booking"}
-            </button>
           </form>
 
-          <aside className="h-fit rounded-xl bg-white p-8 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900">
-              Booking Summary
-            </h2>
+          {/* =====================================================
+              BOOKING SUMMARY
+          ===================================================== */}
+          <aside className="lg:sticky lg:top-28">
+            <div className="overflow-hidden bg-gray-950 text-white shadow-sm">
+              {/* Summary Header */}
+              <div className="border-b border-white/10 p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-400">
+                  Your Stay
+                </p>
 
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {room.name}
-              </h3>
+                <h2 className="mt-3 text-2xl font-semibold">
+                  Booking summary
+                </h2>
+              </div>
 
-              <p className="mt-1 text-sm text-gray-500">
-                {room.type}
-              </p>
+              {/* Room */}
+              <div className="p-6 sm:p-8">
+                <div className="border-b border-white/10 pb-7">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+                    Selected Room
+                  </p>
 
-              <p className="mt-4 text-sm leading-6 text-gray-600">
-                {room.description}
-              </p>
+                  <h3 className="mt-3 text-2xl font-semibold">
+                    {room.name}
+                  </h3>
+
+                  <p className="mt-1 text-sm text-amber-400">
+                    {room.type}
+                  </p>
+
+                  <p className="mt-5 text-sm leading-7 text-gray-400">
+                    {room.description}
+                  </p>
+                </div>
+
+                {/* Details */}
+                <div className="border-b border-white/10 py-7">
+                  <div className="space-y-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm text-gray-400">
+                        Guests
+                      </span>
+
+                      <span className="text-sm font-medium text-white">
+                        {guests}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm text-gray-400">
+                        Nights
+                      </span>
+
+                      <span className="text-sm font-medium text-white">
+                        {nights || "—"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm text-gray-400">
+                        Rate / Night
+                      </span>
+
+                      <span className="text-sm font-medium text-white">
+                        KSh {room.price.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dates */}
+                <div className="border-b border-white/10 py-7">
+                  <div className="space-y-5">
+                    <div>
+                      <p className="text-xs uppercase tracking-wider text-gray-500">
+                        Check-in
+                      </p>
+
+                      <p className="mt-2 text-sm font-medium text-white">
+                        {checkIn
+                          ? new Date(
+                              checkIn
+                            ).toLocaleDateString("en-KE", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })
+                          : "Not selected"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs uppercase tracking-wider text-gray-500">
+                        Check-out
+                      </p>
+
+                      <p className="mt-2 text-sm font-medium text-white">
+                        {checkOut
+                          ? new Date(
+                              checkOut
+                            ).toLocaleDateString("en-KE", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })
+                          : "Not selected"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Total */}
+                <div className="pt-7">
+                  <div className="flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-gray-400">
+                        Total stay
+                      </p>
+
+                      <p className="mt-1 text-xs text-gray-500">
+                        {nights > 0
+                          ? `${nights} ${
+                              nights === 1
+                                ? "night"
+                                : "nights"
+                            }`
+                          : "Awaiting dates"}
+                      </p>
+                    </div>
+
+                    <p className="text-3xl font-semibold text-white">
+                      KSh {total.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="mt-6 space-y-4 border-t pt-6">
-              <div className="flex justify-between gap-4">
-                <span className="text-gray-500">
-                  Guests
-                </span>
+            {/* Hotel Note */}
+            <div className="mt-5 border border-gray-200 bg-white p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
+                Serenity Hotel
+              </p>
 
-                <span className="font-medium text-gray-900">
-                  {guests}
-                </span>
-              </div>
-
-              <div className="flex justify-between gap-4">
-                <span className="text-gray-500">
-                  Nights
-                </span>
-
-                <span className="font-medium text-gray-900">
-                  {nights}
-                </span>
-              </div>
-
-              <div className="flex justify-between gap-4">
-                <span className="text-gray-500">
-                  Rate / Night
-                </span>
-
-                <span className="font-medium text-gray-900">
-                  KSh {room.price.toLocaleString()}
-                </span>
-              </div>
-
-              {checkIn && (
-                <div className="flex justify-between gap-4">
-                  <span className="text-gray-500">
-                    Check-in
-                  </span>
-
-                  <span className="font-medium text-gray-900">
-                    {new Date(checkIn).toLocaleDateString(
-                      "en-KE",
-                      {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      }
-                    )}
-                  </span>
-                </div>
-              )}
-
-              {checkOut && (
-                <div className="flex justify-between gap-4">
-                  <span className="text-gray-500">
-                    Check-out
-                  </span>
-
-                  <span className="font-medium text-gray-900">
-                    {new Date(checkOut).toLocaleDateString(
-                      "en-KE",
-                      {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      }
-                    )}
-                  </span>
-                </div>
-              )}
-
-              <div className="border-t pt-5">
-                <div className="flex items-center justify-between gap-4">
-                  <span className="text-lg font-semibold text-gray-900">
-                    Total
-                  </span>
-
-                  <span className="text-2xl font-bold text-gray-900">
-                    KSh {total.toLocaleString()}
-                  </span>
-                </div>
-              </div>
+              <p className="mt-3 text-sm leading-6 text-gray-600">
+                Enjoy comfortable accommodation, thoughtful service, and
+                warm Kenyan hospitality throughout your stay.
+              </p>
             </div>
           </aside>
         </div>
@@ -535,10 +678,14 @@ export default function BookingForm(
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen items-center justify-center bg-gray-50">
-          <p className="text-gray-600">
-            Loading booking details...
-          </p>
+        <main className="flex min-h-screen items-center justify-center bg-[#f6f3ee] px-6">
+          <div className="text-center">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900" />
+
+            <p className="mt-4 text-sm text-gray-600">
+              Loading booking details...
+            </p>
+          </div>
         </main>
       }
     >
