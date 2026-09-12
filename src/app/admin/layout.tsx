@@ -51,6 +51,12 @@ export default function AdminLayout({
             >
               Customers
             </Link>
+            <Link
+              href="/admin/payments"
+              className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-950"
+            >
+              Payments
+            </Link>
 
             <Link
               href="/admin/restaurant"

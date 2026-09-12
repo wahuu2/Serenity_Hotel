@@ -38,6 +38,48 @@ type Payment = {
   };
 };
 
+function formatStatus(status: string) {
+  if (!status) return "Unknown";
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function formatDate(date: string | null) {
+  if (!date) return "Not paid";
+
+  return new Date(date).toLocaleDateString("en-KE", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function getPaymentStatusClasses(status: Payment["status"]) {
+  switch (status) {
+    case "paid":
+      return "bg-emerald-50 text-emerald-700";
+    case "failed":
+      return "bg-red-50 text-red-700";
+    case "refunded":
+      return "bg-purple-50 text-purple-700";
+    default:
+      return "bg-amber-50 text-amber-700";
+  }
+}
+
+function getBookingStatusClasses(status: string) {
+  switch (status) {
+    case "confirmed":
+      return "bg-emerald-50 text-emerald-700";
+    case "completed":
+      return "bg-blue-50 text-blue-700";
+    case "cancelled":
+      return "bg-red-50 text-red-700";
+    default:
+      return "bg-amber-50 text-amber-700";
+  }
+}
+
 export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +92,6 @@ export default function AdminPaymentsPage() {
         setError("");
 
         const response = await fetch("/api/admin/payments");
-
         const data = await response.json();
 
         if (!response.ok || !data.success) {
@@ -75,63 +116,65 @@ export default function AdminPaymentsPage() {
 
     fetchPayments();
   }, []);
-const handleStatusChange = async (
-  paymentId: string,
-  status: Payment["status"]
-) => {
-  try {
-    const response = await fetch("/api/admin/payments", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        paymentId,
-        status,
-      }),
-    });
 
-    const data = await response.json();
+  const handleStatusChange = async (
+    paymentId: string,
+    status: Payment["status"]
+  ) => {
+    try {
+      const response = await fetch("/api/admin/payments", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          paymentId,
+          status,
+        }),
+      });
 
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.message || "Failed to update payment status."
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Failed to update payment status."
+        );
+      }
+
+      setPayments((currentPayments) =>
+        currentPayments.map((payment) =>
+          payment._id === paymentId
+            ? {
+                ...payment,
+                status: data.payment.status,
+                paidAt: data.payment.paidAt,
+                booking: {
+                  ...payment.booking,
+                  paymentStatus:
+                    data.payment.booking?.paymentStatus ||
+                    payment.booking.paymentStatus,
+                  status:
+                    data.payment.booking?.status ||
+                    payment.booking.status,
+                },
+              }
+            : payment
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Failed to update payment status:",
+        error
+      );
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to update payment status."
       );
     }
+  };
 
-    setPayments((currentPayments) =>
-      currentPayments.map((payment) =>
-        payment._id === paymentId
-          ? {
-              ...payment,
-              status: data.payment.status,
-              paidAt: data.payment.paidAt,
-              booking: {
-                ...payment.booking,
-                paymentStatus:
-                  data.payment.booking?.paymentStatus ||
-                  payment.booking.paymentStatus,
-                status:
-                  data.payment.booking?.status ||
-                  payment.booking.status,
-              },
-            }
-          : payment
-      )
-    );
-  } catch (error) {
-    console.error(
-      "Failed to update payment status:",
-      error
-    );
-
-    alert(
-      error instanceof Error
-        ? error.message
-        : "Failed to update payment status."
-    );
-  }
-};
   const totalPaid = payments
     .filter((payment) => payment.status === "paid")
     .reduce((total, payment) => total + payment.amount, 0);
@@ -150,303 +193,536 @@ const handleStatusChange = async (
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50 px-6 py-12">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-gray-600">
-            Loading payments...
-          </p>
-        </div>
+      <main className="min-h-screen bg-[#f6f3ee]">
+        {/* Header */}
+        <section className="bg-gray-950 px-4 py-12 text-white sm:px-6 sm:py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-500 sm:text-sm">
+              Serenity Hotel
+            </p>
+
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+              Payment Management
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-300 sm:text-base">
+              Monitor customer payments and transaction records.
+            </p>
+          </div>
+        </section>
+
+        {/* Loading */}
+        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+          <div className="rounded-2xl border border-gray-200 bg-white px-6 py-16 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-3 text-sm text-gray-500">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-200 border-t-gray-800" />
+              Loading payments...
+            </div>
+          </div>
+        </section>
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gray-50 px-6 py-12">
-        <div className="mx-auto max-w-7xl">
-          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-            {error}
+      <main className="min-h-screen bg-[#f6f3ee]">
+        {/* Header */}
+        <section className="bg-gray-950 px-4 py-12 text-white sm:px-6 sm:py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-500 sm:text-sm">
+              Serenity Hotel
+            </p>
+
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+              Payment Management
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-300 sm:text-base">
+              Monitor customer payments and transaction records.
+            </p>
           </div>
-        </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-12 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-red-600">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                className="h-6 w-6"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="9"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                />
+                <path
+                  d="M12 8v4"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                />
+                <circle cx="12" cy="16" r="1" fill="currentColor" />
+              </svg>
+            </div>
+
+            <h2 className="mt-4 text-lg font-semibold text-red-900">
+              Unable to Load Payments
+            </h2>
+
+            <p className="mt-2 text-sm text-red-700">
+              {error}
+            </p>
+
+            <Link
+              href="/admin"
+              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+            >
+              Back to Dashboard
+            </Link>
+          </div>
+        </section>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-12">
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
-                Serenity Hotel
-              </p>
-
-              <h1 className="mt-2 text-3xl font-bold text-gray-900">
-                Payment Management
-              </h1>
-
-              <p className="mt-2 text-gray-600">
-                Monitor customer payments and transaction records.
-              </p>
-            </div>
-
-            <Link
-              href="/admin"
-              className="w-fit rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-            >
-              Back to Dashboard
-            </Link>
-          </div>
-        </div>
-
-        {/* Statistics */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Total Revenue
+    <main className="min-h-screen bg-[#f6f3ee]">
+      {/* Page Header */}
+      <section className="bg-gray-950 px-4 py-12 text-white sm:px-6 sm:py-16 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-500 sm:text-sm">
+              Serenity Hotel
             </p>
 
-            <p className="mt-2 text-2xl font-bold text-gray-900">
-              KSh {totalPaid.toLocaleString()}
-            </p>
-          </div>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+              Payment Management
+            </h1>
 
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Paid Payments
-            </p>
-
-            <p className="mt-2 text-2xl font-bold text-gray-900">
-              {paidCount}
-            </p>
-          </div>
-
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Pending Payments
-            </p>
-
-            <p className="mt-2 text-2xl font-bold text-gray-900">
-              {pendingCount}
-            </p>
-          </div>
-
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Failed Payments
-            </p>
-
-            <p className="mt-2 text-2xl font-bold text-gray-900">
-              {failedCount}
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-300 sm:text-base">
+              Monitor customer payments, transaction records, and
+              payment activity from one place.
             </p>
           </div>
         </div>
+      </section>
 
-        {/* Payments */}
-        {payments.length === 0 ? (
-          <div className="rounded-xl bg-white p-10 text-center shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900">
-              No Payments Found
+      {/* Main Content */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        {/* Page Heading */}
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
+              Transactions
+            </p>
+
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-gray-950 sm:text-3xl">
+              Payment Overview
             </h2>
 
-            <p className="mt-2 text-gray-600">
-              There are currently no payment records.
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
+              Review payment activity, booking information, and
+              transaction statuses.
             </p>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {payments.map((payment) => (
-              <div
-                key={payment._id}
-                className="rounded-xl bg-white p-6 shadow-sm"
-              >
-                {/* Payment Header */}
-                <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Transaction Reference
-                    </p>
 
-                    <p className="mt-1 break-all font-semibold text-gray-900">
-                      {payment.transactionReference}
-                    </p>
-                  </div>
+          <Link
+            href="/admin"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
+          >
+            Back to Dashboard
+          </Link>
+        </div>
 
-                  <span
-                    className={`w-fit rounded-full px-3 py-1 text-sm font-semibold ${
-                      payment.status === "paid"
-                        ? "bg-green-100 text-green-700"
-                        : payment.status === "failed"
-                        ? "bg-red-100 text-red-700"
-                        : payment.status === "refunded"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {payment.status.charAt(0).toUpperCase() +
-                      payment.status.slice(1)}
-                  </span>
-                </div>
+        {/* Payment Summary */}
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Revenue */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+                  Total Revenue
+                </p>
 
-                {/* Payment Details */}
-                <div className="grid gap-6 py-6 md:grid-cols-2 lg:grid-cols-4">
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Customer
-                    </p>
+                <p className="mt-3 text-2xl font-semibold text-gray-950 sm:text-3xl">
+                  KSh {totalPaid.toLocaleString()}
+                </p>
 
-                    <p className="mt-1 font-semibold text-gray-900">
-                      {payment.user?.name || "Unknown"}
-                    </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Successfully paid
+                </p>
+              </div>
 
-                    <p className="mt-1 text-sm text-gray-500">
-                      {payment.user?.email || "No email"}
-                    </p>
-                  </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                <span className="text-xs font-bold">KSh</span>
+              </div>
+            </div>
+          </div>
 
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Booking Reference
-                    </p>
+          {/* Paid */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+                  Paid Payments
+                </p>
 
-                    <p className="mt-1 font-semibold text-gray-900">
-                      {payment.booking?.bookingReference ||
-                        "N/A"}
-                    </p>
-                  </div>
+                <p className="mt-3 text-3xl font-semibold text-gray-950">
+                  {paidCount}
+                </p>
 
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Room
-                    </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Completed transactions
+                </p>
+              </div>
 
-                    <p className="mt-1 font-semibold text-gray-900">
-                      {payment.booking?.room?.name || "N/A"}
-                    </p>
-                  </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="m5 12 4 4L19 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
 
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Payment Date
-                    </p>
+          {/* Pending */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+                  Pending Payments
+                </p>
 
-                    <p className="mt-1 font-semibold text-gray-900">
-                      {payment.paidAt
-                        ? new Date(
-                            payment.paidAt
-                          ).toLocaleDateString("en-KE", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "Not paid"}
-                    </p>
-                  </div>
-                </div>
+                <p className="mt-3 text-3xl font-semibold text-gray-950">
+                  {pendingCount}
+                </p>
 
-                {/* Booking Details */}
-                <div className="grid gap-6 border-t pt-6 md:grid-cols-3">
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Check-in
-                    </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Awaiting payment
+                </p>
+              </div>
 
-                    <p className="mt-1 font-medium text-gray-900">
-                      {payment.booking?.checkIn
-                        ? new Date(
-                            payment.booking.checkIn
-                          ).toLocaleDateString("en-KE", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "N/A"}
-                    </p>
-                  </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="8.5"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                  />
+                  <path
+                    d="M12 7v5l3 2"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
 
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Check-out
-                    </p>
+          {/* Failed */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+                  Failed Payments
+                </p>
 
-                    <p className="mt-1 font-medium text-gray-900">
-                      {payment.booking?.checkOut
-                        ? new Date(
-                            payment.booking.checkOut
-                          ).toLocaleDateString("en-KE", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "N/A"}
-                    </p>
-                  </div>
+                <p className="mt-3 text-3xl font-semibold text-gray-950">
+                  {failedCount}
+                </p>
 
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Amount
-                    </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Unsuccessful transactions
+                </p>
+              </div>
 
-                    <p className="mt-1 text-xl font-bold text-gray-900">
-                      {payment.currency}{" "}
-                      {payment.amount.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-700">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M7 7l10 10M17 7 7 17"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                {/* Payment Method */}
-                <div className="mt-6 border-t pt-6">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Payment Method
+        {/* Payment List */}
+        <section className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div className="border-b border-gray-200 px-5 py-5 sm:px-6">
+            <h3 className="text-lg font-semibold text-gray-950">
+              Payment Transactions
+            </h3>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Customer payments and their associated booking details.
+            </p>
+          </div>
+
+          {payments.length === 0 ? (
+            <div className="px-6 py-16 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-5 w-5 text-gray-500"
+                  aria-hidden="true"
+                >
+                  <rect
+                    x="3"
+                    y="5"
+                    width="18"
+                    height="14"
+                    rx="2"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                  />
+                  <path
+                    d="M3 10h18"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                  />
+                  <path
+                    d="M7 15h4"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+
+              <h4 className="mt-4 text-base font-semibold text-gray-950">
+                No Payments Found
+              </h4>
+
+              <p className="mt-1 text-sm text-gray-500">
+                There are currently no payment records.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {payments.map((payment) => (
+                <article
+                  key={payment._id}
+                  className="p-5 transition-colors hover:bg-gray-50 sm:p-6"
+                >
+                  {/* Transaction Header */}
+                  <div className="flex flex-col gap-4 border-b border-gray-100 pb-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Transaction Reference
                       </p>
 
-                      <p className="mt-1 font-semibold capitalize text-gray-900">
+                      <p className="mt-2 break-all font-semibold text-gray-950">
+                        {payment.transactionReference}
+                      </p>
+                    </div>
+
+                    <span
+                      className={`inline-flex w-fit shrink-0 items-center rounded-full px-3 py-1.5 text-xs font-semibold ${getPaymentStatusClasses(
+                        payment.status
+                      )}`}
+                    >
+                      {formatStatus(payment.status)}
+                    </span>
+                  </div>
+
+                  {/* Main Payment Details */}
+                  <div className="grid gap-6 py-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Customer
+                      </p>
+
+                      <p className="mt-2 font-semibold text-gray-900">
+                        {payment.user?.name || "Unknown"}
+                      </p>
+
+                      <p className="mt-1 break-all text-sm text-gray-500">
+                        {payment.user?.email || "No email"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Booking Reference
+                      </p>
+
+                      <p className="mt-2 font-semibold text-gray-900">
+                        {payment.booking?.bookingReference || "N/A"}
+                      </p>
+
+                      <p className="mt-1 text-sm text-gray-500">
+                        {payment.booking?.guestName || "Guest"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Room
+                      </p>
+
+                      <p className="mt-2 font-semibold text-gray-900">
+                        {payment.booking?.room?.name || "N/A"}
+                      </p>
+
+                      <p className="mt-1 text-sm text-gray-500">
+                        {payment.booking?.room?.type || "Room"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Payment Date
+                      </p>
+
+                      <p className="mt-2 font-semibold text-gray-900">
+                        {formatDate(payment.paidAt)}
+                      </p>
+
+                      <p className="mt-1 text-sm text-gray-500">
                         {payment.paymentMethod}
                       </p>
                     </div>
+                  </div>
 
+                  {/* Booking Details */}
+                  <div className="grid gap-6 border-t border-gray-100 pt-6 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
-                      <p className="text-sm text-gray-500">
-                        Booking Status
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Check-in
                       </p>
 
-                      <p className="mt-1 font-semibold capitalize text-gray-900">
-                        {payment.booking?.status || "N/A"}
+                      <p className="mt-2 text-sm font-medium text-gray-900">
+                        {payment.booking?.checkIn
+                          ? formatDate(payment.booking.checkIn)
+                          : "N/A"}
                       </p>
                     </div>
 
                     <div>
-  <p className="text-sm text-gray-500">
-    Payment Status
-  </p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Check-out
+                      </p>
 
-  <select
-    value={payment.status}
-    onChange={(event) =>
-      handleStatusChange(
-        payment._id,
-        event.target.value as Payment["status"]
-      )
-    }
-    className="mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-gray-500"
-  >
-    <option value="pending">Pending</option>
-    <option value="paid">Paid</option>
-    <option value="failed">Failed</option>
-    <option value="refunded">Refunded</option>
-  </select>
-</div>
+                      <p className="mt-2 text-sm font-medium text-gray-900">
+                        {payment.booking?.checkOut
+                          ? formatDate(payment.booking.checkOut)
+                          : "N/A"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Amount
+                      </p>
+
+                      <p className="mt-2 text-xl font-semibold text-gray-950">
+                        {payment.currency}{" "}
+                        {payment.amount.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Booking Status
+                      </p>
+
+                      <span
+                        className={`mt-2 inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold ${getBookingStatusClasses(
+                          payment.booking?.status || ""
+                        )}`}
+                      >
+                        {formatStatus(
+                          payment.booking?.status || "N/A"
+                        )}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+
+                  {/* Payment Controls */}
+                  <div className="mt-6 flex flex-col gap-4 border-t border-gray-100 pt-6 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                        Payment Method
+                      </p>
+
+                      <p className="mt-2 font-semibold capitalize text-gray-900">
+                        {payment.paymentMethod || "N/A"}
+                      </p>
+                    </div>
+
+                    <div className="w-full sm:w-52">
+                      <label
+                        htmlFor={`payment-status-${payment._id}`}
+                        className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-gray-400"
+                      >
+                        Payment Status
+                      </label>
+
+                      <select
+                        id={`payment-status-${payment._id}`}
+                        value={payment.status}
+                        onChange={(event) =>
+                          handleStatusChange(
+                            payment._id,
+                            event.target.value as Payment["status"]
+                          )
+                        }
+                        className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                      </select>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Mobile Hint */}
+        {payments.length > 0 && (
+          <p className="mt-4 text-center text-xs text-gray-400 sm:hidden">
+            Payment records are optimized for mobile viewing.
+          </p>
         )}
-      </div>
+      </section>
     </main>
   );
 }
