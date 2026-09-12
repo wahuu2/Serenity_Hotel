@@ -7,7 +7,7 @@ type RoomDetailsPageProps = {
   params: Promise<{
     id: string;
   }>;
-  
+};
 
 export default async function RoomDetailsPage({
   params,
