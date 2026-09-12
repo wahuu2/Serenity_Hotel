@@ -18,18 +18,15 @@ export default function BookingActions({
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `/api/admin/bookings/${bookingId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: newStatus,
-          }),
-        }
-      );
+      const response = await fetch(`/api/admin/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      });
 
       const data = await response.json();
 
@@ -52,22 +49,45 @@ export default function BookingActions({
     currentStatus === "completed"
   ) {
     return (
-      <span className="text-xs text-gray-400">
+      <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-500">
         No actions
       </span>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       {currentStatus === "pending" && (
         <button
           type="button"
           onClick={() => updateStatus("confirmed")}
           disabled={loading}
-          className="rounded-md bg-green-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-w-[90px] items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "Updating..." : "Confirm"}
+          {loading ? (
+            <>
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              Updating
+            </>
+          ) : (
+            <>
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 10.5 8.5 14 15 7.5"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Confirm
+            </>
+          )}
         </button>
       )}
 
@@ -76,9 +96,32 @@ export default function BookingActions({
           type="button"
           onClick={() => updateStatus("completed")}
           disabled={loading}
-          className="rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-w-[90px] items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "Updating..." : "Complete"}
+          {loading ? (
+            <>
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              Updating
+            </>
+          ) : (
+            <>
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 10.5 8.5 14 15 7.5"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Complete
+            </>
+          )}
         </button>
       )}
 
@@ -86,9 +129,31 @@ export default function BookingActions({
         type="button"
         onClick={() => updateStatus("cancelled")}
         disabled={loading}
-        className="rounded-md bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex min-w-[80px] items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition-all duration-200 hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? "Updating..." : "Cancel"}
+        {loading ? (
+          <>
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-red-200 border-t-red-600" />
+            Updating
+          </>
+        ) : (
+          <>
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              className="h-4 w-4"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 6 14 14M14 6 6 14"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+            Cancel
+          </>
+        )}
       </button>
     </div>
   );
