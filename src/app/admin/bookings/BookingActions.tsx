@@ -18,15 +18,18 @@ export default function BookingActions({
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/admin/bookings/${bookingId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: newStatus,
-        }),
-      });
+      const response = await fetch(
+        `/api/admin/bookings/${bookingId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status: newStatus,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -57,12 +60,13 @@ export default function BookingActions({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
+      {/* Confirm Booking */}
       {currentStatus === "pending" && (
         <button
           type="button"
           onClick={() => updateStatus("confirmed")}
           disabled={loading}
-          className="inline-flex min-w-[90px] items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-10 min-w-[92px] items-center justify-center gap-2 bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? (
             <>
@@ -85,18 +89,20 @@ export default function BookingActions({
                   strokeLinejoin="round"
                 />
               </svg>
+
               Confirm
             </>
           )}
         </button>
       )}
 
+      {/* Complete Booking */}
       {currentStatus === "confirmed" && (
         <button
           type="button"
           onClick={() => updateStatus("completed")}
           disabled={loading}
-          className="inline-flex min-w-[90px] items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-10 min-w-[92px] items-center justify-center gap-2 bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? (
             <>
@@ -119,17 +125,19 @@ export default function BookingActions({
                   strokeLinejoin="round"
                 />
               </svg>
+
               Complete
             </>
           )}
         </button>
       )}
 
+      {/* Cancel Booking */}
       <button
         type="button"
         onClick={() => updateStatus("cancelled")}
         disabled={loading}
-        className="inline-flex min-w-[80px] items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition-all duration-200 hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-10 min-w-[80px] items-center justify-center gap-2 border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? (
           <>
@@ -151,6 +159,7 @@ export default function BookingActions({
                 strokeLinecap="round"
               />
             </svg>
+
             Cancel
           </>
         )}

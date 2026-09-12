@@ -230,18 +230,20 @@ export default function AdminRestaurantPage() {
   return (
     <main className="min-h-screen bg-[#f6f3ee]">
       {/* Page Header */}
-      <section className="bg-gray-950 px-4 py-12 text-white sm:px-6 sm:py-16 lg:px-8">
-        <div className="mx-auto max-w-7xl">
+      <section className="relative overflow-hidden bg-gray-950 px-4 py-12 text-white sm:px-6 sm:py-16 lg:px-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(180,130,50,0.16),transparent_35%)]" />
+
+        <div className="relative mx-auto max-w-7xl">
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-500 sm:text-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-400 sm:text-xs">
               Serenity Hotel
             </p>
 
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+            <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl md:text-5xl">
               Restaurant Management
             </h1>
 
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-300 sm:text-base">
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base sm:leading-8">
               Manage the restaurant menu, item availability, and
               restaurant orders from one place.
             </p>
@@ -250,15 +252,15 @@ export default function AdminRestaurantPage() {
       </section>
 
       {/* Main Content */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
-        {/* Page Heading */}
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <section className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10 lg:px-8 lg:py-14">
+        {/* Page Intro */}
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
               Restaurant
             </p>
 
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-gray-950 sm:text-3xl">
+            <h2 className="mt-2 text-2xl font-semibold text-gray-900 sm:text-3xl">
               Menu Management
             </h2>
 
@@ -271,7 +273,7 @@ export default function AdminRestaurantPage() {
           <div className="flex flex-col gap-2 sm:flex-row">
             <Link
               href="/admin/restaurant/orders"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
+              className="inline-flex min-h-11 items-center justify-center border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
             >
               View Restaurant Orders
             </Link>
@@ -279,7 +281,7 @@ export default function AdminRestaurantPage() {
             <button
               type="button"
               onClick={openAddForm}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+              className="inline-flex min-h-11 items-center justify-center bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
             >
               <span className="mr-2 text-base">+</span>
               Add Menu Item
@@ -288,8 +290,8 @@ export default function AdminRestaurantPage() {
         </div>
 
         {/* Menu Summary */}
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
               Total Items
             </p>
@@ -303,7 +305,7 @@ export default function AdminRestaurantPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
               Available
             </p>
@@ -317,7 +319,7 @@ export default function AdminRestaurantPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
               Unavailable
             </p>
@@ -331,16 +333,16 @@ export default function AdminRestaurantPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+          <div className="bg-gray-950 p-5 text-white shadow-sm sm:p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">
               Categories
             </p>
 
-            <p className="mt-3 text-3xl font-semibold text-gray-950">
+            <p className="mt-3 text-3xl font-semibold text-white">
               {loading ? "—" : categoryCount}
             </p>
 
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-400">
               Menu categories
             </p>
           </div>
@@ -348,15 +350,15 @@ export default function AdminRestaurantPage() {
 
         {/* Add / Edit Form */}
         {showForm && (
-          <section className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <section className="mt-8 border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-200 px-5 py-5 sm:px-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
                     Menu Item
                   </p>
 
-                  <h3 className="mt-1 text-lg font-semibold text-gray-950">
+                  <h3 className="mt-2 text-lg font-semibold text-gray-950">
                     {editingItem
                       ? "Edit Menu Item"
                       : "Add Menu Item"}
@@ -372,7 +374,7 @@ export default function AdminRestaurantPage() {
                 <button
                   type="button"
                   onClick={closeForm}
-                  className="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
+                  className="inline-flex min-h-10 items-center justify-center border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
                 >
                   Cancel
                 </button>
@@ -404,7 +406,7 @@ export default function AdminRestaurantPage() {
                   }
                   placeholder="Chicken Pilau"
                   required
-                  className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+                  className="h-11 w-full border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
                 />
               </div>
 
@@ -426,7 +428,7 @@ export default function AdminRestaurantPage() {
                       category: e.target.value,
                     })
                   }
-                  className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+                  className="h-11 w-full border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -458,7 +460,7 @@ export default function AdminRestaurantPage() {
                   }
                   placeholder="850"
                   required
-                  className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+                  className="h-11 w-full border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
                 />
               </div>
 
@@ -482,7 +484,7 @@ export default function AdminRestaurantPage() {
                     })
                   }
                   placeholder="https://..."
-                  className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+                  className="h-11 w-full border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
                 />
               </div>
 
@@ -507,12 +509,12 @@ export default function AdminRestaurantPage() {
                   placeholder="Describe the meal..."
                   rows={4}
                   required
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm leading-6 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+                  className="w-full border border-gray-300 bg-white px-4 py-3 text-sm leading-6 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
                 />
               </div>
 
               {/* Availability */}
-              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 md:col-span-2">
+              <div className="border border-gray-200 bg-[#faf9f7] p-4 md:col-span-2">
                 <label className="flex cursor-pointer items-start gap-3">
                   <input
                     type="checkbox"
@@ -543,7 +545,7 @@ export default function AdminRestaurantPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gray-950 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex min-h-11 items-center justify-center bg-gray-950 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {saving ? (
                     <>
@@ -560,7 +562,7 @@ export default function AdminRestaurantPage() {
                 <button
                   type="button"
                   onClick={closeForm}
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
+                  className="inline-flex min-h-11 items-center justify-center border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
                 >
                   Cancel
                 </button>
@@ -570,28 +572,34 @@ export default function AdminRestaurantPage() {
         )}
 
         {/* Menu Section */}
-        <section className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <section className="mt-8 border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-200 px-5 py-5 sm:px-6">
-            <h3 className="text-lg font-semibold text-gray-950">
-              Restaurant Menu
-            </h3>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
+                Inventory
+              </p>
 
-            <p className="mt-1 text-sm text-gray-500">
-              Manage your available food and beverage offerings.
-            </p>
+              <h3 className="mt-2 text-lg font-semibold text-gray-950">
+                Restaurant Menu
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Manage your available food and beverage offerings.
+              </p>
+            </div>
           </div>
 
           <div className="p-5 sm:p-6">
             {loading ? (
-              <div className="flex items-center justify-center py-16">
+              <div className="flex items-center justify-center border border-gray-200 bg-[#faf9f7] py-16">
                 <div className="flex items-center gap-3 text-sm text-gray-500">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-200 border-t-gray-800" />
                   Loading menu...
                 </div>
               </div>
             ) : menuItems.length === 0 ? (
-              <div className="py-16 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+              <div className="border border-gray-200 bg-[#faf9f7] py-16 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center bg-gray-100">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -619,166 +627,177 @@ export default function AdminRestaurantPage() {
                 <button
                   type="button"
                   onClick={openAddForm}
-                  className="mt-5 rounded-lg bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                  className="mt-5 bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
                 >
                   Add Menu Item
                 </button>
               </div>
             ) : (
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {menuItems.map((item) => (
-                  <article
-                    key={item._id}
-                    className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                  >
-                    {/* Image */}
-                    {item.image ? (
-                      <div className="relative overflow-hidden">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="h-52 w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                        />
+              <>
+                <div className="mb-4 border border-gray-200 bg-[#faf9f7] px-4 py-3 text-xs text-gray-500 sm:hidden">
+                  Menu items are displayed below. Swipe horizontally if
+                  needed.
+                </div>
 
-                        <div className="absolute left-4 top-4">
-                          <span className="inline-flex items-center rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-gray-800 shadow-sm backdrop-blur">
-                            {formatCategory(item.category)}
-                          </span>
-                        </div>
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {menuItems.map((item) => (
+                    <article
+                      key={item._id}
+                      className="group overflow-hidden border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-gray-900 hover:shadow-md"
+                    >
+                      {/* Image */}
+                      {item.image ? (
+                        <div className="relative overflow-hidden">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-52 w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                          />
 
-                        <div className="absolute right-4 top-4">
-                          <button
-                            type="button"
-                            onClick={() => toggleAvailability(item)}
-                            className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition ${
-                              item.available
-                                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                : "bg-red-50 text-red-700 hover:bg-red-100"
-                            }`}
-                          >
-                            <span
-                              className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
+                          <div className="absolute left-4 top-4">
+                            <span className="inline-flex items-center rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-gray-800 shadow-sm backdrop-blur">
+                              {formatCategory(item.category)}
+                            </span>
+                          </div>
+
+                          <div className="absolute right-4 top-4">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                toggleAvailability(item)
+                              }
+                              className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition ${
                                 item.available
-                                  ? "bg-emerald-500"
-                                  : "bg-red-500"
+                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                  : "bg-red-50 text-red-700 hover:bg-red-100"
                               }`}
-                            />
+                            >
+                              <span
+                                className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
+                                  item.available
+                                    ? "bg-emerald-500"
+                                    : "bg-red-500"
+                                }`}
+                              />
 
-                            {item.available
-                              ? "Available"
-                              : "Unavailable"}
-                          </button>
+                              {item.available
+                                ? "Available"
+                                : "Unavailable"}
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="relative flex h-52 items-center justify-center bg-gray-100 text-gray-400">
-                        <div className="text-center">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            className="mx-auto h-8 w-8"
-                            aria-hidden="true"
-                          >
-                            <rect
-                              x="3"
-                              y="4"
-                              width="18"
-                              height="16"
-                              rx="2"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                            />
-                            <circle
-                              cx="8"
-                              cy="9"
-                              r="1.5"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                            />
-                            <path
-                              d="m4 17 5-5 3 3 2-2 6 5"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                      ) : (
+                        <div className="relative flex h-52 items-center justify-center bg-gray-100 text-gray-400">
+                          <div className="text-center">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              className="mx-auto h-8 w-8"
+                              aria-hidden="true"
+                            >
+                              <rect
+                                x="3"
+                                y="4"
+                                width="18"
+                                height="16"
+                                rx="2"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                              />
+                              <circle
+                                cx="8"
+                                cy="9"
+                                r="1.5"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                              />
+                              <path
+                                d="m4 17 5-5 3 3 2-2 6 5"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
 
-                          <p className="mt-2 text-xs font-medium">
-                            No image
+                            <p className="mt-2 text-xs font-medium">
+                              No image
+                            </p>
+                          </div>
+
+                          <div className="absolute left-4 top-4">
+                            <span className="inline-flex items-center rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
+                              {formatCategory(item.category)}
+                            </span>
+                          </div>
+
+                          <div className="absolute right-4 top-4">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                toggleAvailability(item)
+                              }
+                              className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition ${
+                                item.available
+                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                  : "bg-red-50 text-red-700 hover:bg-red-100"
+                              }`}
+                            >
+                              <span
+                                className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
+                                  item.available
+                                    ? "bg-emerald-500"
+                                    : "bg-red-500"
+                                }`}
+                              />
+
+                              {item.available
+                                ? "Available"
+                                : "Unavailable"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Content */}
+                      <div className="p-5">
+                        <div className="flex items-start justify-between gap-4">
+                          <h4 className="text-lg font-semibold text-gray-950">
+                            {item.name}
+                          </h4>
+
+                          <p className="shrink-0 text-base font-semibold text-gray-950">
+                            KSh {item.price.toLocaleString()}
                           </p>
                         </div>
 
-                        <div className="absolute left-4 top-4">
-                          <span className="inline-flex items-center rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
-                            {formatCategory(item.category)}
-                          </span>
-                        </div>
+                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
+                          {item.description}
+                        </p>
 
-                        <div className="absolute right-4 top-4">
+                        {/* Actions */}
+                        <div className="mt-5 flex gap-2 border-t border-gray-100 pt-5">
                           <button
                             type="button"
-                            onClick={() => toggleAvailability(item)}
-                            className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition ${
-                              item.available
-                                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                : "bg-red-50 text-red-700 hover:bg-red-100"
-                            }`}
+                            onClick={() => openEditForm(item)}
+                            className="inline-flex min-h-10 flex-1 items-center justify-center border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
                           >
-                            <span
-                              className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
-                                item.available
-                                  ? "bg-emerald-500"
-                                  : "bg-red-500"
-                              }`}
-                            />
+                            Edit
+                          </button>
 
-                            {item.available
-                              ? "Available"
-                              : "Unavailable"}
+                          <button
+                            type="button"
+                            onClick={() => deleteItem(item)}
+                            className="inline-flex min-h-10 flex-1 items-center justify-center border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:border-red-600 hover:bg-red-600 hover:text-white"
+                          >
+                            Delete
                           </button>
                         </div>
                       </div>
-                    )}
-
-                    {/* Content */}
-                    <div className="p-5">
-                      <div className="flex items-start justify-between gap-4">
-                        <h4 className="text-lg font-semibold tracking-tight text-gray-950">
-                          {item.name}
-                        </h4>
-
-                        <p className="shrink-0 text-base font-semibold text-gray-950">
-                          KSh {item.price.toLocaleString()}
-                        </p>
-                      </div>
-
-                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
-                        {item.description}
-                      </p>
-
-                      {/* Actions */}
-                      <div className="mt-5 flex gap-2 border-t border-gray-100 pt-5">
-                        <button
-                          type="button"
-                          onClick={() => openEditForm(item)}
-                          className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => deleteItem(item)}
-                          className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:border-red-600 hover:bg-red-600 hover:text-white"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
+                    </article>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </section>

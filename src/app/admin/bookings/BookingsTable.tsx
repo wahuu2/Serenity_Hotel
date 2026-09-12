@@ -126,7 +126,17 @@ export default function BookingsTable({
   return (
     <>
       {/* Filters */}
-      <div className="rounded-2xl border border-gray-200 bg-[#faf9f7] p-4 sm:p-5">
+      <div className="border border-gray-200 bg-[#faf9f7] p-4 sm:p-5">
+        <div className="mb-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-amber-700">
+            Filter Reservations
+          </p>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Search and filter guest reservations.
+          </p>
+        </div>
+
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_200px_200px_auto]">
           {/* Search */}
           <div>
@@ -137,18 +147,16 @@ export default function BookingsTable({
               Search bookings
             </label>
 
-            <div className="relative">
-              <input
-                id="booking-search"
-                type="text"
-                value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
-                placeholder="Reference, guest name or email..."
-                className="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
-              />
-            </div>
+            <input
+              id="booking-search"
+              type="text"
+              value={search}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
+              placeholder="Reference, guest name or email..."
+              className="min-h-11 w-full border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+            />
           </div>
 
           {/* Status Filter */}
@@ -166,7 +174,7 @@ export default function BookingsTable({
               onChange={(event) =>
                 setStatusFilter(event.target.value)
               }
-              className="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+              className="min-h-11 w-full border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
             >
               <option value="all">All statuses</option>
               <option value="pending">Pending</option>
@@ -192,7 +200,7 @@ export default function BookingsTable({
               onChange={(event) =>
                 setDateFilter(event.target.value)
               }
-              className="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+              className="min-h-11 w-full border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
             />
           </div>
 
@@ -202,7 +210,7 @@ export default function BookingsTable({
               <button
                 type="button"
                 onClick={clearFilters}
-                className="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
+                className="min-h-11 w-full border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
               >
                 Clear Filters
               </button>
@@ -212,7 +220,7 @@ export default function BookingsTable({
       </div>
 
       {/* Results Count */}
-      <div className="flex flex-col gap-1 py-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-1 border-b border-gray-200 py-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-gray-500">
           Showing{" "}
           <span className="font-semibold text-gray-900">
@@ -226,7 +234,7 @@ export default function BookingsTable({
         </p>
 
         {hasActiveFilters && (
-          <p className="text-xs text-amber-700">
+          <p className="text-xs font-medium text-amber-700">
             Filters are active
           </p>
         )}
@@ -234,8 +242,8 @@ export default function BookingsTable({
 
       {/* Empty State */}
       {filteredBookings.length === 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-14 text-center shadow-sm">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+        <div className="border border-gray-200 bg-white px-6 py-14 text-center shadow-sm">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center bg-gray-100">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -265,14 +273,14 @@ export default function BookingsTable({
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-5 rounded-lg bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+              className="mt-5 bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
             >
               Clear Filters
             </button>
           )}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="border border-gray-200 bg-white shadow-sm">
           {/* Mobile Scroll Hint */}
           <div className="border-b border-gray-200 bg-[#faf9f7] px-4 py-3 text-xs text-gray-500 sm:hidden">
             Swipe horizontally to view all booking details.
@@ -448,7 +456,7 @@ export default function BookingsTable({
                           href={`/bookings/${booking.bookingReference}/receipt`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
+                          className="inline-flex min-h-10 items-center justify-center border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:border-gray-950 hover:bg-gray-950 hover:text-white"
                         >
                           View Receipt
                         </Link>
