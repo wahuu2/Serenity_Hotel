@@ -6,28 +6,30 @@ export default function Footer() {
       {/* =========================================================
           MAIN FOOTER
       ========================================================= */}
-      <div className="mx-auto max-w-7xl px-6 py-16 md:py-20 lg:px-8">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-10">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <div className="grid gap-10 sm:grid-cols-2 sm:gap-12 lg:grid-cols-4 lg:gap-10">
           {/* =====================================================
               HOTEL
           ===================================================== */}
-          <div className="lg:pr-8">
+          <div className="sm:col-span-2 lg:col-span-1 lg:pr-8">
             <Link
               href="/"
-              className="inline-block text-2xl font-semibold tracking-tight"
+              className="inline-flex items-center text-xl font-semibold tracking-[0.04em] sm:text-2xl"
             >
               Serenity
-              <span className="ml-1 font-normal text-amber-400">Hotel</span>
+              <span className="ml-1 font-normal text-amber-400">
+                Hotel
+              </span>
             </Link>
 
-            <p className="mt-5 max-w-sm text-sm leading-7 text-gray-400">
+            <p className="mt-4 max-w-sm text-sm leading-7 text-gray-400 sm:mt-5">
               A comfortable place to stay, dine, relax, and experience warm
               Kenyan hospitality.
             </p>
 
             <Link
               href="/bookings"
-              className="mt-7 inline-flex border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white hover:text-gray-950"
+              className="mt-6 inline-flex min-h-11 items-center justify-center border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white hover:text-gray-950"
             >
               Book Your Stay
             </Link>
@@ -37,15 +39,15 @@ export default function Footer() {
               EXPLORE
           ===================================================== */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400 sm:text-sm">
               Explore
             </h3>
 
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-4 space-y-1 sm:mt-5">
               <li>
                 <Link
                   href="/"
-                  className="text-sm text-gray-400 transition hover:text-white"
+                  className="flex min-h-10 items-center text-sm text-gray-400 transition hover:text-white"
                 >
                   Home
                 </Link>
@@ -54,7 +56,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/rooms"
-                  className="text-sm text-gray-400 transition hover:text-white"
+                  className="flex min-h-10 items-center text-sm text-gray-400 transition hover:text-white"
                 >
                   Rooms & Suites
                 </Link>
@@ -63,7 +65,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/restaurant"
-                  className="text-sm text-gray-400 transition hover:text-white"
+                  className="flex min-h-10 items-center text-sm text-gray-400 transition hover:text-white"
                 >
                   Restaurant
                 </Link>
@@ -72,7 +74,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/services"
-                  className="text-sm text-gray-400 transition hover:text-white"
+                  className="flex min-h-10 items-center text-sm text-gray-400 transition hover:text-white"
                 >
                   Hotel Services
                 </Link>
@@ -81,7 +83,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-sm text-gray-400 transition hover:text-white"
+                  className="flex min-h-10 items-center text-sm text-gray-400 transition hover:text-white"
                 >
                   Contact Us
                 </Link>
@@ -93,28 +95,28 @@ export default function Footer() {
               SERVICES
           ===================================================== */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400 sm:text-sm">
               At Serenity
             </h3>
 
-            <ul className="mt-5 space-y-3">
-              <li className="text-sm text-gray-400">
+            <ul className="mt-4 space-y-1 sm:mt-5">
+              <li className="flex min-h-10 items-center text-sm text-gray-400">
                 Comfortable Accommodation
               </li>
 
-              <li className="text-sm text-gray-400">
+              <li className="flex min-h-10 items-center text-sm text-gray-400">
                 Restaurant & Dining
               </li>
 
-              <li className="text-sm text-gray-400">
+              <li className="flex min-h-10 items-center text-sm text-gray-400">
                 Room Service
               </li>
 
-              <li className="text-sm text-gray-400">
+              <li className="flex min-h-10 items-center text-sm text-gray-400">
                 Housekeeping
               </li>
 
-              <li className="text-sm text-gray-400">
+              <li className="flex min-h-10 items-center text-sm text-gray-400">
                 Conference & Events
               </li>
             </ul>
@@ -123,14 +125,14 @@ export default function Footer() {
           {/* =====================================================
               CONTACT
           ===================================================== */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400 sm:text-sm">
               Contact
             </h3>
 
-            <div className="mt-5 space-y-4 text-sm text-gray-400">
+            <div className="mt-4 space-y-4 text-sm text-gray-400 sm:mt-5">
               <div>
-                <p className="text-xs uppercase tracking-wider text-gray-500">
+                <p className="text-[11px] uppercase tracking-[0.15em] text-gray-500">
                   Location
                 </p>
 
@@ -140,27 +142,33 @@ export default function Footer() {
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-wider text-gray-500">
+                <p className="text-[11px] uppercase tracking-[0.15em] text-gray-500">
                   Phone
                 </p>
 
-                <p className="mt-1">
+                <a
+                  href="tel:+254700000000"
+                  className="mt-1 inline-block transition hover:text-white"
+                >
                   +254 700 000 000
-                </p>
+                </a>
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-wider text-gray-500">
+                <p className="text-[11px] uppercase tracking-[0.15em] text-gray-500">
                   Email
                 </p>
 
-                <p className="mt-1 break-all">
+                <a
+                  href="mailto:info@serenityhotel.com"
+                  className="mt-1 inline-block break-all transition hover:text-white"
+                >
                   info@serenityhotel.com
-                </p>
+                </a>
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-wider text-gray-500">
+                <p className="text-[11px] uppercase tracking-[0.15em] text-gray-500">
                   Front Desk
                 </p>
 
@@ -177,14 +185,17 @@ export default function Footer() {
           FOOTER DIVIDER
       ========================================================= */}
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-6 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left lg:px-8">
-          <p className="text-xs text-gray-500 sm:text-sm">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-center sm:px-6 sm:py-6 md:flex-row md:items-center md:justify-between md:text-left lg:px-8">
+          <p className="text-xs leading-5 text-gray-500 sm:text-sm">
             © {new Date().getFullYear()} Serenity Hotel. All rights reserved.
           </p>
 
-          <p className="text-xs tracking-wide text-gray-500 sm:text-sm">
-            Comfort <span className="mx-1 text-amber-500">•</span> Luxury{" "}
-            <span className="mx-1 text-amber-500">•</span> Hospitality
+          <p className="text-xs leading-5 tracking-wide text-gray-500 sm:text-sm">
+            Comfort{" "}
+            <span className="mx-1 text-amber-500">•</span>{" "}
+            Luxury{" "}
+            <span className="mx-1 text-amber-500">•</span>{" "}
+            Hospitality
           </p>
         </div>
       </div>
