@@ -2,91 +2,189 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-2 lg:grid-cols-4">
-        {/* Hotel */}
-        <div>
-          <h2 className="text-2xl font-bold">Serenity Hotel</h2>
+    <footer className="bg-gray-950 text-white">
+      {/* =========================================================
+          MAIN FOOTER
+      ========================================================= */}
+      <div className="mx-auto max-w-7xl px-6 py-16 md:py-20 lg:px-8">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-10">
+          {/* =====================================================
+              HOTEL
+          ===================================================== */}
+          <div className="lg:pr-8">
+            <Link
+              href="/"
+              className="inline-block text-2xl font-semibold tracking-tight"
+            >
+              Serenity
+              <span className="ml-1 font-normal text-amber-400">Hotel</span>
+            </Link>
 
-          <p className="mt-4 leading-7 text-gray-400">
-            Experience comfort, luxury, and exceptional hospitality
-            during every stay.
-          </p>
-        </div>
+            <p className="mt-5 max-w-sm text-sm leading-7 text-gray-400">
+              A comfortable place to stay, dine, relax, and experience warm
+              Kenyan hospitality.
+            </p>
 
-        {/* Quick Links */}
-        <div>
-          <h3 className="text-lg font-semibold">Quick Links</h3>
+            <Link
+              href="/bookings"
+              className="mt-7 inline-flex border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white hover:text-gray-950"
+            >
+              Book Your Stay
+            </Link>
+          </div>
 
-          <ul className="mt-4 space-y-3 text-gray-400">
-            <li>
-              <Link href="/" className="hover:text-white">
-                Home
-              </Link>
-            </li>
+          {/* =====================================================
+              EXPLORE
+          ===================================================== */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+              Explore
+            </h3>
 
-            <li>
-              <Link href="/rooms" className="hover:text-white">
-                Rooms
-              </Link>
-            </li>
+            <ul className="mt-5 space-y-3">
+              <li>
+                <Link
+                  href="/"
+                  className="text-sm text-gray-400 transition hover:text-white"
+                >
+                  Home
+                </Link>
+              </li>
 
-            <li>
-              <Link href="/restaurant" className="hover:text-white">
-                Restaurant
-              </Link>
-            </li>
+              <li>
+                <Link
+                  href="/rooms"
+                  className="text-sm text-gray-400 transition hover:text-white"
+                >
+                  Rooms & Suites
+                </Link>
+              </li>
 
-            <li>
-              <Link href="/services" className="hover:text-white">
-                Services
-              </Link>
-            </li>
+              <li>
+                <Link
+                  href="/restaurant"
+                  className="text-sm text-gray-400 transition hover:text-white"
+                >
+                  Restaurant
+                </Link>
+              </li>
 
-            <li>
-              <Link href="/contact" className="hover:text-white">
-                Contact
-              </Link>
-            </li>
-          </ul>
-        </div>
+              <li>
+                <Link
+                  href="/services"
+                  className="text-sm text-gray-400 transition hover:text-white"
+                >
+                  Hotel Services
+                </Link>
+              </li>
 
-        {/* Services */}
-        <div>
-          <h3 className="text-lg font-semibold">Our Services</h3>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-sm text-gray-400 transition hover:text-white"
+                >
+                  Contact Us
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-          <ul className="mt-4 space-y-3 text-gray-400">
-            <li>Room Service</li>
-            <li>Housekeeping</li>
-            <li>Laundry Service</li>
-            <li>Airport Transfers</li>
-            <li>Conference & Events</li>
-          </ul>
-        </div>
+          {/* =====================================================
+              SERVICES
+          ===================================================== */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+              At Serenity
+            </h3>
 
-        {/* Contact */}
-        <div>
-          <h3 className="text-lg font-semibold">Contact</h3>
+            <ul className="mt-5 space-y-3">
+              <li className="text-sm text-gray-400">
+                Comfortable Accommodation
+              </li>
 
-          <div className="mt-4 space-y-3 text-gray-400">
-            <p>Nairobi, Kenya</p>
-            <p>+254 700 000 000</p>
-            <p>info@serenityhotel.com</p>
-            <p>Front Desk: Open 24/7</p>
+              <li className="text-sm text-gray-400">
+                Restaurant & Dining
+              </li>
+
+              <li className="text-sm text-gray-400">
+                Room Service
+              </li>
+
+              <li className="text-sm text-gray-400">
+                Housekeeping
+              </li>
+
+              <li className="text-sm text-gray-400">
+                Conference & Events
+              </li>
+            </ul>
+          </div>
+
+          {/* =====================================================
+              CONTACT
+          ===================================================== */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+              Contact
+            </h3>
+
+            <div className="mt-5 space-y-4 text-sm text-gray-400">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-gray-500">
+                  Location
+                </p>
+
+                <p className="mt-1">
+                  Nairobi, Kenya
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-gray-500">
+                  Phone
+                </p>
+
+                <p className="mt-1">
+                  +254 700 000 000
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-gray-500">
+                  Email
+                </p>
+
+                <p className="mt-1 break-all">
+                  info@serenityhotel.com
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-gray-500">
+                  Front Desk
+                </p>
+
+                <p className="mt-1">
+                  Open 24/7
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom */}
-      <div className="border-t border-gray-800">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-center text-sm text-gray-500 md:flex-row md:items-center md:justify-between md:text-left">
-          <p>
-            © {new Date().getFullYear()} Serenity Hotel. All rights
-            reserved.
+      {/* =========================================================
+          FOOTER DIVIDER
+      ========================================================= */}
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-6 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left lg:px-8">
+          <p className="text-xs text-gray-500 sm:text-sm">
+            © {new Date().getFullYear()} Serenity Hotel. All rights reserved.
           </p>
 
-          <p>
-            Comfort • Luxury • Hospitality
+          <p className="text-xs tracking-wide text-gray-500 sm:text-sm">
+            Comfort <span className="mx-1 text-amber-500">•</span> Luxury{" "}
+            <span className="mx-1 text-amber-500">•</span> Hospitality
           </p>
         </div>
       </div>
